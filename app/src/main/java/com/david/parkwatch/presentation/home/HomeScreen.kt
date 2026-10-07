@@ -29,21 +29,21 @@ fun HomeScreen(
     val spacing = parkSpacing()
 
     ScreenScaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .background(colors.background),
     ) { contentPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .padding(spacing.SpaceLg)
-                .background(colors.background),
+                .padding(spacing.SpaceLg),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(R.string.home_empty_title),
-                fontSize = 22.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                style = androidx.wear.compose.material3.MaterialTheme.typography.titleMedium,
                 color = colors.onBackground,
                 textAlign = TextAlign.Center,
                 maxLines = 2,

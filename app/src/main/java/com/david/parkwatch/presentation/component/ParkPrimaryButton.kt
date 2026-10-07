@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
@@ -51,15 +51,13 @@ fun ParkPrimaryButton(
                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceSm))
                 Text(
                     text = label,
-                    fontSize = 16.sp,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         } else {
             Text(
                 text = label,
-                fontSize = 16.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
