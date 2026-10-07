@@ -37,7 +37,7 @@ fun ParkPrimaryButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = spacing.SpaceLg),
+            .padding(horizontal = spacing.SpaceMd),
         colors = buttonColors,
         enabled = enabled,
     ) {
