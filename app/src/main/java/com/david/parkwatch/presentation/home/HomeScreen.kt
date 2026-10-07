@@ -46,11 +46,6 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = "🚗",
-                        fontSize = 64.sp,
-                    )
-                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceLg))
-                    Text(
                         text = stringResource(R.string.home_empty_title),
                         fontSize = 22.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
