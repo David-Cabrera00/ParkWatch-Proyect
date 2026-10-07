@@ -46,6 +46,8 @@ dependencies {
     implementation(libs.play.services.wearable)
     implementation(libs.ui)
     implementation(libs.ui.graphics)
+    implementation(libs.material)
+    implementation(libs.material.icons.extended)
     implementation(libs.ui.tooling.preview)
     implementation(libs.wear.tooling.preview)
     androidTestImplementation(platform(libs.compose.bom))

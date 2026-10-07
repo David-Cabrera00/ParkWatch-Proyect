@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,11 +45,32 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
+                text = "ParkWatch",
+                style = androidx.wear.compose.material3.MaterialTheme.typography.labelMedium,
+                color = colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceSm))
+            Icon(
+                imageVector = Icons.Filled.LocalParking,
+                contentDescription = "Parking location",
+                modifier = Modifier.size(48.dp),
+                tint = colors.primary,
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceMd))
+            Text(
                 text = stringResource(R.string.home_empty_title),
                 style = androidx.wear.compose.material3.MaterialTheme.typography.titleMedium,
                 color = colors.onBackground,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXs))
+            Text(
+                text = stringResource(R.string.home_empty_subtitle),
+                style = androidx.wear.compose.material3.MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXl))
             ParkPrimaryButton(
