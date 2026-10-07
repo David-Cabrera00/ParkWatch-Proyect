@@ -1,5 +1,6 @@
 package com.david.parkwatch.presentation.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +15,10 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.R
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 
@@ -37,7 +40,8 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(spacing.SpaceLg),
+                        .padding(spacing.SpaceLg)
+                        .background(colors.background),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -47,7 +51,7 @@ fun HomeScreen(
                     )
                     androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceLg))
                     Text(
-                        text = "Where did you park?",
+                        text = stringResource(R.string.home_empty_title),
                         fontSize = 22.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                         color = colors.onBackground,
@@ -57,7 +61,7 @@ fun HomeScreen(
                     androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXl))
                     ParkPrimaryButton(
                         onClick = onSaveVehicleClick,
-                        label = "Save vehicle",
+                        label = stringResource(R.string.home_save_vehicle),
                     )
                 }
             }
