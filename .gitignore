@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# OpenCode local tooling
+.opencode/
+
+# Android Studio
+.idea/
