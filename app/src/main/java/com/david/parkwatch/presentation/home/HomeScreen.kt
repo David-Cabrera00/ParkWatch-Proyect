@@ -2,6 +2,7 @@ package com.david.parkwatch.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,8 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.compose.ui.res.stringResource
@@ -33,40 +32,45 @@ fun HomeScreen(
             .fillMaxSize()
             .background(colors.background),
     ) { contentPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .padding(spacing.SpaceLg),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = "ParkWatch",
-                style = androidx.wear.compose.material3.MaterialTheme.typography.labelMedium,
-                color = colors.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceMd))
-            Text(
-                text = stringResource(R.string.home_empty_title),
-                style = androidx.wear.compose.material3.MaterialTheme.typography.titleMedium,
-                color = colors.onBackground,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-            )
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXs))
-            Text(
-                text = stringResource(R.string.home_empty_subtitle),
-                style = androidx.wear.compose.material3.MaterialTheme.typography.bodySmall,
-                color = colors.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXl))
-            ParkPrimaryButton(
-                onClick = onSaveVehicleClick,
-                label = stringResource(R.string.home_save_vehicle),
-            )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = spacing.SpaceLg),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "ParkWatch",
+                    style = androidx.wear.compose.material3.MaterialTheme.typography.labelMedium,
+                    color = colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceMd))
+                Text(
+                    text = stringResource(R.string.home_empty_title),
+                    style = androidx.wear.compose.material3.MaterialTheme.typography.titleMedium,
+                    color = colors.onBackground,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                )
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                Text(
+                    text = stringResource(R.string.home_empty_subtitle),
+                    style = androidx.wear.compose.material3.MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXl))
+                ParkPrimaryButton(
+                    onClick = onSaveVehicleClick,
+                    label = stringResource(R.string.home_save_vehicle),
+                )
+            }
         }
     }
 }
