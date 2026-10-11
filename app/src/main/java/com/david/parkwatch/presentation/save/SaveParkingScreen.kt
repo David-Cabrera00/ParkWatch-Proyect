@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
@@ -27,14 +28,23 @@ import com.david.parkwatch.presentation.component.ParkPrimaryButton
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 
+private enum class SaveStep {
+    FLOOR,
+    ZONE,
+}
+
 @Composable
 fun SaveParkingScreen(
     modifier: Modifier = Modifier,
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
-    val floors = listOf("P1", "P2", "P3", "B1", "B2")
+    val floors = stringArrayResource(R.array.save_parking_floor_options).toList()
+    val zones = stringArrayResource(R.array.save_parking_zone_options).toList()
+    val currentStep = remember { mutableStateOf(SaveStep.FLOOR) }
     val selectedFloor = remember { mutableStateOf<String?>(null) }
+    val selectedZone = remember { mutableStateOf<String?>(null) }
+    val options = if (currentStep.value == SaveStep.FLOOR) floors else zones
 
     ScreenScaffold(
         modifier = modifier
@@ -63,7 +73,13 @@ fun SaveParkingScreen(
                     )
                     Spacer(modifier = Modifier.size(spacing.SpaceXs))
                     Text(
-                        text = stringResource(R.string.save_parking_floor_prompt),
+                        text = stringResource(
+                            if (currentStep.value == SaveStep.FLOOR) {
+                                R.string.save_parking_floor_prompt
+                            } else {
+                                R.string.save_parking_zone_prompt
+                            },
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -71,10 +87,20 @@ fun SaveParkingScreen(
                     )
                 }
             }
-            items(floors) { floor ->
+            items(options) { option ->
                 RadioButton(
-                    selected = selectedFloor.value == floor,
-                    onSelect = { selectedFloor.value = floor },
+                    selected = if (currentStep.value == SaveStep.FLOOR) {
+                        selectedFloor.value == option
+                    } else {
+                        selectedZone.value == option
+                    },
+                    onSelect = {
+                        if (currentStep.value == SaveStep.FLOOR) {
+                            selectedFloor.value = option
+                        } else {
+                            selectedZone.value = option
+                        }
+                    },
                     colors = RadioButtonDefaults.radioButtonColors(
                         selectedContainerColor = colors.primaryContainer,
                         selectedContentColor = colors.onPrimaryContainer,
@@ -85,7 +111,7 @@ fun SaveParkingScreen(
                     ),
                     label = {
                         Text(
-                            text = floor,
+                            text = option,
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     },
@@ -93,9 +119,17 @@ fun SaveParkingScreen(
             }
             item {
                 ParkPrimaryButton(
-                    onClick = {},
+                    onClick = {
+                        if (currentStep.value == SaveStep.FLOOR) {
+                            currentStep.value = SaveStep.ZONE
+                        }
+                    },
                     label = stringResource(R.string.save_parking_continue),
-                    enabled = selectedFloor.value != null,
+                    enabled = if (currentStep.value == SaveStep.FLOOR) {
+                        selectedFloor.value != null
+                    } else {
+                        selectedZone.value != null
+                    },
                 )
             }
         }
