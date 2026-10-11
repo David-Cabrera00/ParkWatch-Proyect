@@ -4,4 +4,6 @@
     <string name="home_empty_title">¿Dónde estacionaste?</string>
     <string name="home_save_vehicle">Guardar</string>
     <string name="home_empty_subtitle">Sin ubicación activa</string>
+    <string name="save_parking_title">Guardar ubicación</string>
+    <string name="save_parking_floor_prompt">Selecciona el piso</string>
 </resources>

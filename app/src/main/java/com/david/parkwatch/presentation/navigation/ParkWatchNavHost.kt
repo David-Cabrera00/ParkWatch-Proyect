@@ -5,8 +5,10 @@ import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.david.parkwatch.presentation.home.HomeScreen
+import com.david.parkwatch.presentation.save.SaveParkingScreen
 
 private const val HomeRoute = "home"
+private const val SaveRoute = "save"
 
 @Composable
 fun ParkWatchNavHost() {
@@ -17,7 +19,10 @@ fun ParkWatchNavHost() {
         startDestination = HomeRoute,
     ) {
         composable(HomeRoute) {
-            HomeScreen(onSaveVehicleClick = {})
+            HomeScreen(onSaveVehicleClick = { navController.navigate(SaveRoute) })
+        }
+        composable(SaveRoute) {
+            SaveParkingScreen()
         }
     }
 }
