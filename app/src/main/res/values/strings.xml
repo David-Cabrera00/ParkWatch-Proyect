@@ -6,4 +6,5 @@
     <string name="home_empty_subtitle">Sin ubicación activa</string>
     <string name="save_parking_title">Guardar ubicación</string>
     <string name="save_parking_floor_prompt">Selecciona el piso</string>
+    <string name="save_parking_continue">Continuar</string>
 </resources>

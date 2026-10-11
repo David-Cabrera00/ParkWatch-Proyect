@@ -23,6 +23,7 @@ import androidx.wear.compose.material3.RadioButtonDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
+import com.david.parkwatch.presentation.component.ParkPrimaryButton
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 
@@ -88,6 +89,13 @@ fun SaveParkingScreen(
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     },
+                )
+            }
+            item {
+                ParkPrimaryButton(
+                    onClick = {},
+                    label = stringResource(R.string.save_parking_continue),
+                    enabled = selectedFloor.value != null,
                 )
             }
         }
