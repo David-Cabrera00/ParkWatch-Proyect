@@ -3,6 +3,7 @@ package com.david.parkwatch.presentation.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -37,7 +38,8 @@ fun ParkPrimaryButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = spacing.SpaceLg),
+            .heightIn(min = 48.dp)
+            .padding(horizontal = spacing.SpaceMd),
         colors = buttonColors,
         enabled = enabled,
     ) {
@@ -52,12 +54,14 @@ fun ParkPrimaryButton(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
+                    color = colors.onPrimary,
                 )
             }
         } else {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
+                color = colors.onPrimary,
             )
         }
     }

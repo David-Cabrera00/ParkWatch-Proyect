@@ -42,11 +42,25 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
+                text = "ParkWatch",
+                style = androidx.wear.compose.material3.MaterialTheme.typography.labelMedium,
+                color = colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceMd))
+            Text(
                 text = stringResource(R.string.home_empty_title),
                 style = androidx.wear.compose.material3.MaterialTheme.typography.titleMedium,
                 color = colors.onBackground,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXs))
+            Text(
+                text = stringResource(R.string.home_empty_subtitle),
+                style = androidx.wear.compose.material3.MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.size(spacing.SpaceXl))
             ParkPrimaryButton(

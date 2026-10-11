@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import com.david.parkwatch.presentation.home.HomeScreen
+import com.david.parkwatch.presentation.navigation.ParkWatchNavHost
 import com.david.parkwatch.presentation.theme.ParkWatchTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WearApp() {
     ParkWatchTheme {
-        HomeScreen(onSaveVehicleClick = { /* TODO: Navigation to save screen */ })
+        ParkWatchNavHost()
     }
 }
 
