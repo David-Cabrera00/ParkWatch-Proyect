@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.RadioButton
 import androidx.wear.compose.material3.RadioButtonDefaults
@@ -37,31 +40,37 @@ fun SaveParkingScreen(
             .fillMaxSize()
             .background(colors.background),
     ) { contentPadding ->
-        Column(
+        ScalingLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding)
-                .padding(spacing.SpaceLg),
-            verticalArrangement = Arrangement.Center,
+                .padding(contentPadding),
+            contentPadding = PaddingValues(
+                vertical = spacing.SpaceLg,
+                horizontal = spacing.SpaceMd,
+            ),
+            verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = stringResource(R.string.save_parking_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = colors.onBackground,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-            )
-            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-            Text(
-                text = stringResource(R.string.save_parking_floor_prompt),
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-            )
-            Spacer(modifier = Modifier.size(spacing.SpaceMd))
-            floors.forEach { floor ->
+            item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.save_parking_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.onBackground,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                    )
+                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                    Text(
+                        text = stringResource(R.string.save_parking_floor_prompt),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                    )
+                }
+            }
+            items(floors) { floor ->
                 RadioButton(
                     selected = selectedFloor.value == floor,
                     onSelect = { selectedFloor.value = floor },
@@ -80,9 +89,6 @@ fun SaveParkingScreen(
                         )
                     },
                 )
-                if (floor != floors.last()) {
-                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                }
             }
         }
     }
