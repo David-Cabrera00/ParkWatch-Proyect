@@ -54,12 +54,14 @@ fun ParkPrimaryButton(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
+                    color = colors.onPrimary,
                 )
             }
         } else {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelLarge,
+                color = colors.onPrimary,
             )
         }
     }
