@@ -6,4 +6,19 @@
     <string name="home_empty_subtitle">Sin ubicación activa</string>
     <string name="save_parking_title">Guardar ubicación</string>
     <string name="save_parking_floor_prompt">Selecciona el piso</string>
+    <string name="save_parking_zone_prompt">Selecciona la zona</string>
+    <string name="save_parking_continue">Continuar</string>
+    <string-array name="save_parking_floor_options">
+        <item>P1</item>
+        <item>P2</item>
+        <item>P3</item>
+        <item>B1</item>
+        <item>B2</item>
+    </string-array>
+    <string-array name="save_parking_zone_options">
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+    </string-array>
 </resources>
