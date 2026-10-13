@@ -4,9 +4,12 @@
     <string name="home_empty_title">¿Dónde estacionaste?</string>
     <string name="home_save_vehicle">Guardar</string>
     <string name="home_empty_subtitle">Sin ubicación activa</string>
+    <string name="home_view_vehicle">Ver vehículo</string>
+    <string name="home_saved_title">Vehículo estacionado</string>
     <string name="save_parking_title">Guardar ubicación</string>
     <string name="save_parking_floor_prompt">Selecciona el piso</string>
     <string name="save_parking_zone_prompt">Selecciona la zona</string>
+    <string name="save_parking_row_prompt">Selecciona la fila</string>
     <string name="save_parking_continue">Continuar</string>
     <string-array name="save_parking_floor_options">
         <item>P1</item>
@@ -20,5 +23,77 @@
         <item>B</item>
         <item>C</item>
         <item>D</item>
+    </string-array>
+    <string-array name="save_parking_row_options">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+    </string-array>
+    <string name="save_parking_spot_prompt">Puesto (opcional)</string>
+    <string name="save_parking_spot_skip">Omitir</string>
+    <string name="save_parking_spot_none">Sin puesto</string>
+    <string name="save_parking_review_title">Revisar ubicación</string>
+    <string name="save_parking_floor_label">Piso</string>
+    <string name="save_parking_zone_label">Zona</string>
+    <string name="save_parking_row_label">Fila</string>
+    <string name="save_parking_spot_label">Puesto</string>
+    <string name="save_parking_save">Guardar</string>
+    <string name="save_parking_edit">Editar</string>
+    <string name="save_parking_success_title">¡Ubicación guardada!</string>
+    <string name="save_parking_success_subtitle">Vehículo registrado</string>
+    <string name="save_parking_done">Listo</string>
+    <string name="detail_title">Tu vehículo</string>
+    <string name="detail_time_just_now">Estacionado hace un momento</string>
+    <string name="detail_time_minutes">Estacionado hace %1$d min</string>
+    <string name="detail_time_hours_minutes">Estacionado hace %1$d h %2$d min</string>
+    <string name="detail_edit">Editar</string>
+    <string name="detail_delete">Eliminar</string>
+    <string name="delete_confirm_title">¿Eliminar ubicación?</string>
+    <string name="delete_confirm_subtitle">Se borrarán los datos guardados</string>
+    <string name="delete_confirm_cancel">Cancelar</string>
+    <string name="delete_confirm_delete">Eliminar</string>
+    <string-array name="save_parking_spot_options">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
     </string-array>
 </resources>

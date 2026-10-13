@@ -1,10 +1,11 @@
 package com.david.parkwatch.presentation.save
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,27 +25,56 @@ import androidx.wear.compose.material3.RadioButtonDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
+import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
+import java.util.UUID
 
 private enum class SaveStep {
     FLOOR,
     ZONE,
+    ROW,
+    SPOT,
+    REVIEW,
+    CONFIRMATION,
 }
 
 @Composable
 fun SaveParkingScreen(
     modifier: Modifier = Modifier,
+    initialLocation: ParkingLocation? = null,
+    onSaveSuccess: (ParkingLocation) -> Unit = {},
+    onNavigateBack: () -> Unit = {},
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
     val floors = stringArrayResource(R.array.save_parking_floor_options).toList()
     val zones = stringArrayResource(R.array.save_parking_zone_options).toList()
+    val rows = stringArrayResource(R.array.save_parking_row_options).toList()
+    val spots = stringArrayResource(R.array.save_parking_spot_options).toList()
+    val noneSpotLabel = stringResource(R.string.save_parking_spot_none)
+
     val currentStep = remember { mutableStateOf(SaveStep.FLOOR) }
-    val selectedFloor = remember { mutableStateOf<String?>(null) }
-    val selectedZone = remember { mutableStateOf<String?>(null) }
-    val options = if (currentStep.value == SaveStep.FLOOR) floors else zones
+    val selectedFloor = remember { mutableStateOf<String?>(initialLocation?.floor) }
+    val selectedZone = remember { mutableStateOf<String?>(initialLocation?.zone) }
+    val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row) }
+    val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot) }
+
+    BackHandler(enabled = currentStep.value != SaveStep.FLOOR) {
+        currentStep.value = when (currentStep.value) {
+            SaveStep.FLOOR -> SaveStep.FLOOR
+            SaveStep.ZONE -> SaveStep.FLOOR
+            SaveStep.ROW -> SaveStep.ZONE
+            SaveStep.SPOT -> SaveStep.ROW
+            SaveStep.REVIEW -> SaveStep.SPOT
+            SaveStep.CONFIRMATION -> {
+                onNavigateBack()
+                SaveStep.CONFIRMATION
+            }
+        }
+    }
 
     ScreenScaffold(
         modifier = modifier
@@ -62,75 +92,290 @@ fun SaveParkingScreen(
             verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            item {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(R.string.save_parking_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colors.onBackground,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                    )
-                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                    Text(
-                        text = stringResource(
-                            if (currentStep.value == SaveStep.FLOOR) {
-                                R.string.save_parking_floor_prompt
-                            } else {
-                                R.string.save_parking_zone_prompt
+            when (currentStep.value) {
+                SaveStep.FLOOR, SaveStep.ZONE, SaveStep.ROW -> {
+                    val options = when (currentStep.value) {
+                        SaveStep.FLOOR -> floors
+                        SaveStep.ZONE -> zones
+                        else -> rows
+                    }
+                    val promptRes = when (currentStep.value) {
+                        SaveStep.FLOOR -> R.string.save_parking_floor_prompt
+                        SaveStep.ZONE -> R.string.save_parking_zone_prompt
+                        else -> R.string.save_parking_row_prompt
+                    }
+
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(R.string.save_parking_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = stringResource(promptRes),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+
+                    items(options) { option ->
+                        val isSelected = when (currentStep.value) {
+                            SaveStep.FLOOR -> selectedFloor.value == option
+                            SaveStep.ZONE -> selectedZone.value == option
+                            else -> selectedRow.value == option
+                        }
+                        RadioButton(
+                            selected = isSelected,
+                            onSelect = {
+                                when (currentStep.value) {
+                                    SaveStep.FLOOR -> selectedFloor.value = option
+                                    SaveStep.ZONE -> selectedZone.value = option
+                                    else -> selectedRow.value = option
+                                }
                             },
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                    )
-                }
-            }
-            items(options) { option ->
-                RadioButton(
-                    selected = if (currentStep.value == SaveStep.FLOOR) {
-                        selectedFloor.value == option
-                    } else {
-                        selectedZone.value == option
-                    },
-                    onSelect = {
-                        if (currentStep.value == SaveStep.FLOOR) {
-                            selectedFloor.value = option
-                        } else {
-                            selectedZone.value = option
-                        }
-                    },
-                    colors = RadioButtonDefaults.radioButtonColors(
-                        selectedContainerColor = colors.primaryContainer,
-                        selectedContentColor = colors.onPrimaryContainer,
-                        selectedControlColor = colors.primary,
-                        unselectedContainerColor = colors.surfaceContainer,
-                        unselectedContentColor = colors.onSurface,
-                        unselectedControlColor = colors.onSurfaceVariant,
-                    ),
-                    label = {
-                        Text(
-                            text = option,
-                            style = MaterialTheme.typography.bodyLarge,
+                            colors = RadioButtonDefaults.radioButtonColors(
+                                selectedContainerColor = colors.primaryContainer,
+                                selectedContentColor = colors.onPrimaryContainer,
+                                selectedControlColor = colors.primary,
+                                unselectedContainerColor = colors.surfaceContainer,
+                                unselectedContentColor = colors.onSurface,
+                                unselectedControlColor = colors.onSurfaceVariant,
+                            ),
+                            label = {
+                                Text(
+                                    text = option,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            },
                         )
-                    },
-                )
-            }
-            item {
-                ParkPrimaryButton(
-                    onClick = {
-                        if (currentStep.value == SaveStep.FLOOR) {
-                            currentStep.value = SaveStep.ZONE
+                    }
+
+                    item {
+                        val isEnabled = when (currentStep.value) {
+                            SaveStep.FLOOR -> selectedFloor.value != null
+                            SaveStep.ZONE -> selectedZone.value != null
+                            else -> selectedRow.value != null
                         }
-                    },
-                    label = stringResource(R.string.save_parking_continue),
-                    enabled = if (currentStep.value == SaveStep.FLOOR) {
-                        selectedFloor.value != null
-                    } else {
-                        selectedZone.value != null
-                    },
-                )
+                        ParkPrimaryButton(
+                            onClick = {
+                                when (currentStep.value) {
+                                    SaveStep.FLOOR -> currentStep.value = SaveStep.ZONE
+                                    SaveStep.ZONE -> currentStep.value = SaveStep.ROW
+                                    else -> currentStep.value = SaveStep.SPOT
+                                }
+                            },
+                            label = stringResource(R.string.save_parking_continue),
+                            enabled = isEnabled,
+                        )
+                    }
+                }
+
+                SaveStep.SPOT -> {
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(R.string.save_parking_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = stringResource(R.string.save_parking_spot_prompt),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+
+                    item {
+                        RadioButton(
+                            selected = selectedSpot.value == null,
+                            onSelect = { selectedSpot.value = null },
+                            colors = RadioButtonDefaults.radioButtonColors(
+                                selectedContainerColor = colors.primaryContainer,
+                                selectedContentColor = colors.onPrimaryContainer,
+                                selectedControlColor = colors.primary,
+                                unselectedContainerColor = colors.surfaceContainer,
+                                unselectedContentColor = colors.onSurface,
+                                unselectedControlColor = colors.onSurfaceVariant,
+                            ),
+                            label = {
+                                Text(
+                                    text = noneSpotLabel,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            },
+                        )
+                    }
+
+                    items(spots) { spot ->
+                        RadioButton(
+                            selected = selectedSpot.value == spot,
+                            onSelect = { selectedSpot.value = spot },
+                            colors = RadioButtonDefaults.radioButtonColors(
+                                selectedContainerColor = colors.primaryContainer,
+                                selectedContentColor = colors.onPrimaryContainer,
+                                selectedControlColor = colors.primary,
+                                unselectedContainerColor = colors.surfaceContainer,
+                                unselectedContentColor = colors.onSurface,
+                                unselectedControlColor = colors.onSurfaceVariant,
+                            ),
+                            label = {
+                                Text(
+                                    text = spot,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            },
+                        )
+                    }
+
+                    item {
+                        val buttonLabel = if (selectedSpot.value != null) {
+                            stringResource(R.string.save_parking_continue)
+                        } else {
+                            stringResource(R.string.save_parking_spot_skip)
+                        }
+                        ParkPrimaryButton(
+                            onClick = {
+                                currentStep.value = SaveStep.REVIEW
+                            },
+                            label = buttonLabel,
+                            enabled = true,
+                        )
+                    }
+                }
+
+                SaveStep.REVIEW -> {
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(R.string.save_parking_review_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                            Text(
+                                text = "${selectedFloor.value ?: ""} • Zona ${selectedZone.value ?: ""}",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = colors.primary,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = buildString {
+                                    append("Fila ${selectedRow.value ?: ""}")
+                                    val spot = selectedSpot.value
+                                    if (spot != null) {
+                                        append(" • Puesto $spot")
+                                    } else {
+                                        append(" • $noneSpotLabel")
+                                    }
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                    }
+
+                    item {
+                        ParkPrimaryButton(
+                            onClick = {
+                                val location = ParkingLocation(
+                                    id = initialLocation?.id ?: UUID.randomUUID().toString(),
+                                    floor = selectedFloor.value.orEmpty(),
+                                    zone = selectedZone.value.orEmpty(),
+                                    row = selectedRow.value.orEmpty(),
+                                    spot = selectedSpot.value,
+                                    parkedAt = initialLocation?.parkedAt ?: System.currentTimeMillis(),
+                                    createdAt = initialLocation?.createdAt ?: System.currentTimeMillis(),
+                                    updatedAt = System.currentTimeMillis(),
+                                )
+                                onSaveSuccess(location)
+                                currentStep.value = SaveStep.CONFIRMATION
+                            },
+                            label = stringResource(R.string.save_parking_save),
+                        )
+                    }
+
+                    item {
+                        ParkSecondaryButton(
+                            onClick = {
+                                currentStep.value = SaveStep.FLOOR
+                            },
+                            label = stringResource(R.string.save_parking_edit),
+                        )
+                    }
+                }
+
+                SaveStep.CONFIRMATION -> {
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(R.string.save_parking_success_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.primary,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = stringResource(R.string.save_parking_success_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceMd))
+                            Text(
+                                text = "${selectedFloor.value ?: ""} • Zona ${selectedZone.value ?: ""}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.onBackground,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = buildString {
+                                    append("Fila ${selectedRow.value ?: ""}")
+                                    val spot = selectedSpot.value
+                                    if (spot != null) {
+                                        append(" • Puesto $spot")
+                                    }
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                    }
+
+                    item {
+                        ParkPrimaryButton(
+                            onClick = onNavigateBack,
+                            label = stringResource(R.string.save_parking_done),
+                        )
+                    }
+                }
             }
         }
     }
