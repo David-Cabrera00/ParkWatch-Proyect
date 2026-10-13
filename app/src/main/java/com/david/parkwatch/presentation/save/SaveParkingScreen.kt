@@ -1,5 +1,6 @@
 package com.david.parkwatch.presentation.save
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import com.david.parkwatch.presentation.theme.parkSpacing
 private enum class SaveStep {
     FLOOR,
     ZONE,
+    ROW,
 }
 
 @Composable
@@ -41,10 +43,34 @@ fun SaveParkingScreen(
     val spacing = parkSpacing()
     val floors = stringArrayResource(R.array.save_parking_floor_options).toList()
     val zones = stringArrayResource(R.array.save_parking_zone_options).toList()
+    val rows = stringArrayResource(R.array.save_parking_row_options).toList()
+
     val currentStep = remember { mutableStateOf(SaveStep.FLOOR) }
     val selectedFloor = remember { mutableStateOf<String?>(null) }
     val selectedZone = remember { mutableStateOf<String?>(null) }
-    val options = if (currentStep.value == SaveStep.FLOOR) floors else zones
+    val selectedRow = remember { mutableStateOf<String?>(null) }
+
+    BackHandler(enabled = currentStep.value != SaveStep.FLOOR) {
+        currentStep.value = when (currentStep.value) {
+            SaveStep.ROW -> SaveStep.ZONE
+            SaveStep.ZONE -> SaveStep.FLOOR
+            SaveStep.FLOOR -> SaveStep.FLOOR
+        }
+    }
+
+    val options = when (currentStep.value) {
+        SaveStep.FLOOR -> floors
+        SaveStep.ZONE -> zones
+        SaveStep.ROW -> rows
+    }
+
+    val promptText = stringResource(
+        when (currentStep.value) {
+            SaveStep.FLOOR -> R.string.save_parking_floor_prompt
+            SaveStep.ZONE -> R.string.save_parking_zone_prompt
+            SaveStep.ROW -> R.string.save_parking_row_prompt
+        }
+    )
 
     ScreenScaffold(
         modifier = modifier
@@ -73,13 +99,7 @@ fun SaveParkingScreen(
                     )
                     Spacer(modifier = Modifier.size(spacing.SpaceXs))
                     Text(
-                        text = stringResource(
-                            if (currentStep.value == SaveStep.FLOOR) {
-                                R.string.save_parking_floor_prompt
-                            } else {
-                                R.string.save_parking_zone_prompt
-                            },
-                        ),
+                        text = promptText,
                         style = MaterialTheme.typography.bodyMedium,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -89,16 +109,16 @@ fun SaveParkingScreen(
             }
             items(options) { option ->
                 RadioButton(
-                    selected = if (currentStep.value == SaveStep.FLOOR) {
-                        selectedFloor.value == option
-                    } else {
-                        selectedZone.value == option
+                    selected = when (currentStep.value) {
+                        SaveStep.FLOOR -> selectedFloor.value == option
+                        SaveStep.ZONE -> selectedZone.value == option
+                        SaveStep.ROW -> selectedRow.value == option
                     },
                     onSelect = {
-                        if (currentStep.value == SaveStep.FLOOR) {
-                            selectedFloor.value = option
-                        } else {
-                            selectedZone.value = option
+                        when (currentStep.value) {
+                            SaveStep.FLOOR -> selectedFloor.value = option
+                            SaveStep.ZONE -> selectedZone.value = option
+                            SaveStep.ROW -> selectedRow.value = option
                         }
                     },
                     colors = RadioButtonDefaults.radioButtonColors(
@@ -120,15 +140,19 @@ fun SaveParkingScreen(
             item {
                 ParkPrimaryButton(
                     onClick = {
-                        if (currentStep.value == SaveStep.FLOOR) {
-                            currentStep.value = SaveStep.ZONE
+                        when (currentStep.value) {
+                            SaveStep.FLOOR -> currentStep.value = SaveStep.ZONE
+                            SaveStep.ZONE -> currentStep.value = SaveStep.ROW
+                            SaveStep.ROW -> {
+                                // TODO: Siguiente bloque (puesto opcional / revisión)
+                            }
                         }
                     },
                     label = stringResource(R.string.save_parking_continue),
-                    enabled = if (currentStep.value == SaveStep.FLOOR) {
-                        selectedFloor.value != null
-                    } else {
-                        selectedZone.value != null
+                    enabled = when (currentStep.value) {
+                        SaveStep.FLOOR -> selectedFloor.value != null
+                        SaveStep.ZONE -> selectedZone.value != null
+                        SaveStep.ROW -> selectedRow.value != null
                     },
                 )
             }
