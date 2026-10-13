@@ -6,6 +6,8 @@
     <string name="home_empty_subtitle">Sin ubicación activa</string>
     <string name="home_view_vehicle">Ver vehículo</string>
     <string name="home_saved_title">Vehículo estacionado</string>
+    <string name="home_voice_input">Dictar por voz</string>
+    <string name="voice_prompt">Di piso, zona, fila y puesto</string>
     <string name="save_parking_title">Guardar ubicación</string>
     <string name="save_parking_floor_prompt">Selecciona el piso</string>
     <string name="save_parking_zone_prompt">Selecciona la zona</string>

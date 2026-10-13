@@ -26,6 +26,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.domain.parser.ParsedParkingInfo
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.theme.parkColors
@@ -45,6 +46,7 @@ private enum class SaveStep {
 fun SaveParkingScreen(
     modifier: Modifier = Modifier,
     initialLocation: ParkingLocation? = null,
+    initialParsed: ParsedParkingInfo? = null,
     onSaveSuccess: (ParkingLocation) -> Unit = {},
     onNavigateBack: () -> Unit = {},
 ) {
@@ -56,11 +58,20 @@ fun SaveParkingScreen(
     val spots = stringArrayResource(R.array.save_parking_spot_options).toList()
     val noneSpotLabel = stringResource(R.string.save_parking_spot_none)
 
-    val currentStep = remember { mutableStateOf(SaveStep.FLOOR) }
-    val selectedFloor = remember { mutableStateOf<String?>(initialLocation?.floor) }
-    val selectedZone = remember { mutableStateOf<String?>(initialLocation?.zone) }
-    val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row) }
-    val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot) }
+    val currentStep = remember {
+        mutableStateOf(
+            when {
+                initialParsed?.isComplete == true -> SaveStep.REVIEW
+                initialParsed?.floor != null && initialParsed.zone != null -> SaveStep.ROW
+                initialParsed?.floor != null -> SaveStep.ZONE
+                else -> SaveStep.FLOOR
+            }
+        )
+    }
+    val selectedFloor = remember { mutableStateOf<String?>(initialLocation?.floor ?: initialParsed?.floor) }
+    val selectedZone = remember { mutableStateOf<String?>(initialLocation?.zone ?: initialParsed?.zone) }
+    val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row ?: initialParsed?.row) }
+    val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot ?: initialParsed?.spot) }
 
     BackHandler(enabled = currentStep.value != SaveStep.FLOOR) {
         currentStep.value = when (currentStep.value) {
