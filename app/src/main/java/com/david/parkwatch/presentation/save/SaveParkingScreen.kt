@@ -44,6 +44,7 @@ private enum class SaveStep {
 @Composable
 fun SaveParkingScreen(
     modifier: Modifier = Modifier,
+    initialLocation: ParkingLocation? = null,
     onSaveSuccess: (ParkingLocation) -> Unit = {},
     onNavigateBack: () -> Unit = {},
 ) {
@@ -56,10 +57,10 @@ fun SaveParkingScreen(
     val noneSpotLabel = stringResource(R.string.save_parking_spot_none)
 
     val currentStep = remember { mutableStateOf(SaveStep.FLOOR) }
-    val selectedFloor = remember { mutableStateOf<String?>(null) }
-    val selectedZone = remember { mutableStateOf<String?>(null) }
-    val selectedRow = remember { mutableStateOf<String?>(null) }
-    val selectedSpot = remember { mutableStateOf<String?>(null) }
+    val selectedFloor = remember { mutableStateOf<String?>(initialLocation?.floor) }
+    val selectedZone = remember { mutableStateOf<String?>(initialLocation?.zone) }
+    val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row) }
+    val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot) }
 
     BackHandler(enabled = currentStep.value != SaveStep.FLOOR) {
         currentStep.value = when (currentStep.value) {
@@ -298,13 +299,13 @@ fun SaveParkingScreen(
                         ParkPrimaryButton(
                             onClick = {
                                 val location = ParkingLocation(
-                                    id = UUID.randomUUID().toString(),
+                                    id = initialLocation?.id ?: UUID.randomUUID().toString(),
                                     floor = selectedFloor.value.orEmpty(),
                                     zone = selectedZone.value.orEmpty(),
                                     row = selectedRow.value.orEmpty(),
                                     spot = selectedSpot.value,
-                                    parkedAt = System.currentTimeMillis(),
-                                    createdAt = System.currentTimeMillis(),
+                                    parkedAt = initialLocation?.parkedAt ?: System.currentTimeMillis(),
+                                    createdAt = initialLocation?.createdAt ?: System.currentTimeMillis(),
                                     updatedAt = System.currentTimeMillis(),
                                 )
                                 onSaveSuccess(location)

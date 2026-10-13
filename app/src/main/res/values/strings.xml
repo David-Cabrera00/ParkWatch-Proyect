@@ -54,6 +54,16 @@
     <string name="save_parking_success_title">¡Ubicación guardada!</string>
     <string name="save_parking_success_subtitle">Vehículo registrado</string>
     <string name="save_parking_done">Listo</string>
+    <string name="detail_title">Tu vehículo</string>
+    <string name="detail_time_just_now">Estacionado hace un momento</string>
+    <string name="detail_time_minutes">Estacionado hace %1$d min</string>
+    <string name="detail_time_hours_minutes">Estacionado hace %1$d h %2$d min</string>
+    <string name="detail_edit">Editar</string>
+    <string name="detail_delete">Eliminar</string>
+    <string name="delete_confirm_title">¿Eliminar ubicación?</string>
+    <string name="delete_confirm_subtitle">Se borrarán los datos guardados</string>
+    <string name="delete_confirm_cancel">Cancelar</string>
+    <string name="delete_confirm_delete">Eliminar</string>
     <string-array name="save_parking_spot_options">
         <item>1</item>
         <item>2</item>
