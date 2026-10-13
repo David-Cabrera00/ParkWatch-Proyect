@@ -2,8 +2,8 @@ package com.david.parkwatch.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -37,26 +38,32 @@ fun HomeScreen(
             .fillMaxSize()
             .background(colors.background),
     ) { contentPadding ->
-        Box(
+        ScalingLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding),
+            contentPadding = PaddingValues(
+                top = spacing.SpaceMd,
+                bottom = spacing.SpaceXl,
+                start = spacing.SpaceMd,
+                end = spacing.SpaceMd,
+            ),
+            verticalArrangement = Arrangement.spacedBy(spacing.SpaceXs),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (location == null) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(horizontal = spacing.SpaceLg),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+                item {
                     Text(
                         text = "ParkWatch",
                         style = MaterialTheme.typography.labelMedium,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
-                    Spacer(modifier = Modifier.size(spacing.SpaceMd))
+                }
+                item {
+                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                }
+                item {
                     Text(
                         text = stringResource(R.string.home_empty_title),
                         style = MaterialTheme.typography.titleMedium,
@@ -64,50 +71,56 @@ fun HomeScreen(
                         textAlign = TextAlign.Center,
                         maxLines = 2,
                     )
-                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                }
+                item {
                     Text(
                         text = stringResource(R.string.home_empty_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
-                    Spacer(modifier = Modifier.size(spacing.SpaceXl))
+                }
+                item {
+                    Spacer(modifier = Modifier.size(spacing.SpaceMd))
+                }
+                item {
                     ParkPrimaryButton(
                         onClick = onSaveVehicleClick,
                         label = stringResource(R.string.home_save_vehicle),
                     )
                 }
             } else {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(horizontal = spacing.SpaceLg),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+                item {
                     Text(
                         text = stringResource(R.string.home_saved_title),
                         style = MaterialTheme.typography.labelMedium,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
-                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                }
+                item {
                     Text(
                         text = location.floor,
-                        style = MaterialTheme.typography.numeralLarge,
+                        style = MaterialTheme.typography.numeralMedium,
                         color = colors.primary,
                         textAlign = TextAlign.Center,
                     )
+                }
+                item {
                     Text(
                         text = buildString {
                             append("Zona ${location.zone} • Fila ${location.row}")
-                            location.spot?.let { append(" • Puesto $it") }
+                            location.spot?.let { append("\nPuesto $it") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = colors.onBackground,
                         textAlign = TextAlign.Center,
                     )
-                    Spacer(modifier = Modifier.size(spacing.SpaceLg))
+                }
+                item {
+                    Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                }
+                item {
                     ParkPrimaryButton(
                         onClick = onViewVehicleClick,
                         label = stringResource(R.string.home_view_vehicle),
