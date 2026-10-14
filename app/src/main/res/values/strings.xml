@@ -66,6 +66,8 @@
     <string name="delete_confirm_subtitle">Se borrarán los datos guardados</string>
     <string name="delete_confirm_cancel">Cancelar</string>
     <string name="delete_confirm_delete">Eliminar</string>
+    <string name="detail_open_map">Ver en mapa</string>
+    <string name="save_parking_gps_captured">GPS guardado</string>
     <string-array name="save_parking_spot_options">
         <item>1</item>
         <item>2</item>

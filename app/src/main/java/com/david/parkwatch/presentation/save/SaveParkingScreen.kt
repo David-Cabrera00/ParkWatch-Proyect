@@ -1,6 +1,9 @@
 package com.david.parkwatch.presentation.save
 
+import android.Manifest
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,10 +13,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +30,7 @@ import androidx.wear.compose.material3.RadioButtonDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
+import com.david.parkwatch.data.location.LocationHelper
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.parser.ParsedParkingInfo
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
@@ -72,6 +78,49 @@ fun SaveParkingScreen(
     val selectedZone = remember { mutableStateOf<String?>(initialLocation?.zone ?: initialParsed?.zone) }
     val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row ?: initialParsed?.row) }
     val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot ?: initialParsed?.spot) }
+
+    val context = LocalContext.current
+    val locationHelper = remember { LocationHelper(context) }
+    val capturedCoordinates = remember {
+        mutableStateOf(
+            if (initialLocation?.latitude != null && initialLocation.longitude != null) {
+                Pair(initialLocation.latitude, initialLocation.longitude)
+            } else {
+                null
+            }
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            val coords = locationHelper.getLastKnownCoordinates()
+            if (coords != null) {
+                capturedCoordinates.value = coords
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (initialLocation == null && capturedCoordinates.value == null) {
+            if (locationHelper.hasLocationPermission()) {
+                val coords = locationHelper.getLastKnownCoordinates()
+                if (coords != null) {
+                    capturedCoordinates.value = coords
+                }
+            } else {
+                permissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                    )
+                )
+            }
+        }
+    }
 
     BackHandler(enabled = currentStep.value != SaveStep.FLOOR) {
         currentStep.value = when (currentStep.value) {
@@ -299,6 +348,15 @@ fun SaveParkingScreen(
                                 color = colors.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
                             )
+                            if (capturedCoordinates.value != null) {
+                                Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                                Text(
+                                    text = "📍 " + stringResource(R.string.save_parking_gps_captured),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = colors.secondary,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
                         }
                     }
 
@@ -315,6 +373,8 @@ fun SaveParkingScreen(
                                     zone = selectedZone.value.orEmpty(),
                                     row = selectedRow.value.orEmpty(),
                                     spot = selectedSpot.value,
+                                    latitude = capturedCoordinates.value?.first,
+                                    longitude = capturedCoordinates.value?.second,
                                     parkedAt = initialLocation?.parkedAt ?: System.currentTimeMillis(),
                                     createdAt = initialLocation?.createdAt ?: System.currentTimeMillis(),
                                     updatedAt = System.currentTimeMillis(),
@@ -373,6 +433,15 @@ fun SaveParkingScreen(
                                 color = colors.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
                             )
+                            if (capturedCoordinates.value != null) {
+                                Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                                Text(
+                                    text = "📍 " + stringResource(R.string.save_parking_gps_captured),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = colors.secondary,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
                         }
                     }
 
