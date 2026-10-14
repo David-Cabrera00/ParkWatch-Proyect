@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
@@ -35,29 +37,43 @@ fun ParkLocationCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
             .background(colors.surfaceContainer)
-            .padding(spacing.SpaceLg),
+            .padding(spacing.SpaceMd),
         verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
     ) {
-        Text(floor, style = MaterialTheme.typography.numeralLarge, color = colors.primary)
-        Row(horizontalArrangement = Arrangement.spacedBy(spacing.SpaceXl)) {
-            Column {
-                Text("Zona", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
-                Text(zone, style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
+        Text(
+            text = floor,
+            style = MaterialTheme.typography.numeralLarge,
+            color = colors.primary,
+            maxLines = 1,
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Zona", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(zone, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
             }
-            Column {
-                Text("Fila", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
-                Text(row, style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Fila", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(row, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
             }
             if (!spot.isNullOrBlank()) {
-                Column {
-                    Text("Puesto", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
-                    Text(spot, style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
+                Column(modifier = Modifier.weight(1.2f)) {
+                    Text("Puesto", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
+                    Text(spot, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
                 }
             }
         }
         if (!elapsedTime.isNullOrBlank()) {
             Spacer(modifier = Modifier.size(spacing.SpaceXs))
-            Text(elapsedTime, style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
+            Text(
+                text = elapsedTime,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
