@@ -57,11 +57,20 @@ fun ParkLocationCard(
                 Text("Fila", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
                 Text(row, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
             }
-            if (!spot.isNullOrBlank()) {
-                Column(modifier = Modifier.weight(1.2f)) {
-                    Text("Puesto", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
-                    Text(spot, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
-                }
+        }
+        if (!spot.isNullOrBlank()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
+            ) {
+                Text("Puesto", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(
+                    text = spot,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = colors.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
         if (!elapsedTime.isNullOrBlank()) {
