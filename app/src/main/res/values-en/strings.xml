@@ -3,6 +3,15 @@
     <string name="location_zone">Zone</string>
     <string name="location_row">Row</string>
     <string name="location_spot">Spot</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_system">System</string>
+    <string name="settings_language_spanish">Español</string>
+    <string name="settings_language_english">English</string>
     <string name="home_brand">ParkWatch</string>
     <string name="home_empty_title">Where did you park?</string>
     <string name="home_save_vehicle">Save vehicle</string>
