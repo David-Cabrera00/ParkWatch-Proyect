@@ -1,4 +1,12 @@
 pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            when (requested.id.id) {
+                "com.android.application" -> useModule("com.android.tools.build:gradle:${requested.version}")
+                "org.jetbrains.kotlin.plugin.compose" -> useModule("org.jetbrains.kotlin:compose-compiler-gradle-plugin:${requested.version}")
+            }
+        }
+    }
     repositories {
         google {
             content {
@@ -11,9 +19,6 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -24,4 +29,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "ParkWatch"
 include(":app")
- 

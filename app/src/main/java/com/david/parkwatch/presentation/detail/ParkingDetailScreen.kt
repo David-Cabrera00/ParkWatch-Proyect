@@ -27,6 +27,7 @@ import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.presentation.component.ParkDestructiveButton
+import com.david.parkwatch.presentation.component.ParkLocationCard
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
@@ -80,37 +81,18 @@ fun ParkingDetailScreen(
                     )
                 }
                 item {
-                    Text(
-                        text = location.floor,
-                        style = MaterialTheme.typography.numeralMedium,
-                        color = colors.primary,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                item {
-                    Text(
-                        text = buildString {
-                            append("Zona ${location.zone} • Fila ${location.row}")
-                            location.spot?.let { append("\nPuesto $it") }
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.onBackground,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                item {
-                    val elapsedTimeText = formatElapsedTime(location.parkedAt)
-                    Text(
-                        text = elapsedTimeText,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
+                    ParkLocationCard(
+                        floor = location.floor,
+                        zone = location.zone,
+                        row = location.row,
+                        spot = location.spot,
+                        elapsedTime = formatElapsedTime(location.parkedAt),
                     )
                 }
                 if (location.latitude != null && location.longitude != null) {
                     item {
                         Text(
-                            text = "📍 " + stringResource(R.string.save_parking_gps_captured),
+                            text = stringResource(R.string.save_parking_gps_captured),
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.secondary,
                             textAlign = TextAlign.Center,
@@ -119,7 +101,7 @@ fun ParkingDetailScreen(
                     item {
                         ParkSecondaryButton(
                             onClick = {
-                                val uri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehículo)")
+                                val uri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehicle)")
                                 val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
                                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 }
@@ -199,4 +181,3 @@ private fun formatElapsedTime(parkedAt: Long): String {
         else -> stringResource(R.string.detail_time_hours_minutes, hours, minutes)
     }
 }
-
