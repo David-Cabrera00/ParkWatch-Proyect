@@ -12,6 +12,7 @@
     <string name="settings_language_system">Sistema</string>
     <string name="settings_language_spanish">Español</string>
     <string name="settings_language_english">English</string>
+    <string name="settings_open">Ajustes</string>
     <string name="home_brand">ParkWatch</string>
     <string name="home_empty_title">¿Dónde estacionaste?</string>
     <string name="home_save_vehicle">Guardar vehículo</string>

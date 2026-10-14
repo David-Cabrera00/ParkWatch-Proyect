@@ -14,6 +14,7 @@ import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.david.parkwatch.R
+import com.david.parkwatch.data.preferences.AppPreferences
 import com.david.parkwatch.data.repository.ParkingRepository
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.parser.ParsedParkingInfo
@@ -21,14 +22,19 @@ import com.david.parkwatch.domain.parser.VoiceParkingParser
 import com.david.parkwatch.presentation.detail.ParkingDetailScreen
 import com.david.parkwatch.presentation.home.HomeScreen
 import com.david.parkwatch.presentation.save.SaveParkingScreen
+import com.david.parkwatch.presentation.settings.SettingsScreen
 
 private const val HomeRoute = "home"
 private const val SaveRoute = "save"
 private const val DetailRoute = "detail"
 private const val EditRoute = "edit"
+private const val SettingsRoute = "settings"
 
 @Composable
-fun ParkWatchNavHost() {
+fun ParkWatchNavHost(
+    preferences: AppPreferences,
+    onPreferencesChanged: (AppPreferences) -> Unit,
+) {
     val context = LocalContext.current
     val repository = remember { ParkingRepository(context) }
     val savedLocation = remember { mutableStateOf<ParkingLocation?>(repository.getParkingLocation()) }
@@ -83,6 +89,7 @@ fun ParkWatchNavHost() {
                     }
                 },
                 onViewVehicleClick = { navController.navigate(DetailRoute) },
+                onSettingsClick = { navController.navigate(SettingsRoute) },
             )
         }
         composable(SaveRoute) {
@@ -128,6 +135,13 @@ fun ParkWatchNavHost() {
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+            )
+        }
+        composable(SettingsRoute) {
+            SettingsScreen(
+                preferences = preferences,
+                onThemeSelected = { mode -> onPreferencesChanged(preferences.copy(themeMode = mode)) },
+                onLanguageSelected = { language -> onPreferencesChanged(preferences.copy(language = language)) },
             )
         }
     }
