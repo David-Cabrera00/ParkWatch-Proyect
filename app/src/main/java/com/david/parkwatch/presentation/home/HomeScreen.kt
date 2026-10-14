@@ -38,6 +38,7 @@ fun HomeScreen(
     onSaveVehicleClick: () -> Unit,
     onVoiceClick: () -> Unit = {},
     onViewVehicleClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
@@ -123,6 +124,12 @@ fun HomeScreen(
                         label = stringResource(R.string.home_voice_input),
                     )
                 }
+                item {
+                    ParkSecondaryButton(
+                        onClick = onSettingsClick,
+                        label = stringResource(R.string.settings_open),
+                    )
+                }
             } else {
                 item {
                     Text(
@@ -151,6 +158,12 @@ fun HomeScreen(
                     ParkPrimaryButton(
                         onClick = onViewVehicleClick,
                         label = stringResource(R.string.home_view_vehicle),
+                    )
+                }
+                item {
+                    ParkSecondaryButton(
+                        onClick = onSettingsClick,
+                        label = stringResource(R.string.settings_open),
                     )
                 }
             }

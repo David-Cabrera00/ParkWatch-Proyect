@@ -3,6 +3,16 @@
     <string name="location_zone">Zona</string>
     <string name="location_row">Fila</string>
     <string name="location_spot">Puesto</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_language_title">Idioma</string>
+    <string name="settings_language_system">Sistema</string>
+    <string name="settings_language_spanish">Español</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_open">Ajustes</string>
     <string name="home_brand">ParkWatch</string>
     <string name="home_empty_title">¿Dónde estacionaste?</string>
     <string name="home_save_vehicle">Guardar vehículo</string>
