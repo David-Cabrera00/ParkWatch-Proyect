@@ -43,6 +43,7 @@ import com.david.parkwatch.data.location.LocationHelper
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.parser.ParsedParkingInfo
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.presentation.component.ParkLocationCard
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
@@ -383,26 +384,11 @@ fun SaveParkingScreen(
                                 maxLines = 2,
                             )
                             Spacer(modifier = Modifier.size(spacing.SpaceSm))
-                            Text(
-                                text = "${selectedFloor.value ?: ""} · Zona ${selectedZone.value ?: ""}",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = colors.primary,
-                                textAlign = TextAlign.Center,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = buildString {
-                                    append("Fila ${selectedRow.value ?: ""}")
-                                    val spot = selectedSpot.value
-                                    if (spot != null) {
-                                        append("· Puesto $spot")
-                                    } else {
-                                        append("· $noneSpotLabel")
-                                    }
-                                },
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colors.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
+                            ParkLocationCard(
+                                floor = selectedFloor.value.orEmpty(),
+                                zone = selectedZone.value.orEmpty(),
+                                row = selectedRow.value.orEmpty(),
+                                spot = selectedSpot.value ?: noneSpotLabel,
                             )
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))
@@ -414,10 +400,6 @@ fun SaveParkingScreen(
                                 )
                             }
                         }
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.size(spacing.SpaceXs))
                     }
 
                     item {
@@ -471,24 +453,11 @@ fun SaveParkingScreen(
                                 textAlign = TextAlign.Center,
                             )
                             Spacer(modifier = Modifier.size(spacing.SpaceMd))
-                            Text(
-                                text = "${selectedFloor.value ?: ""} · Zona ${selectedZone.value ?: ""}",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = colors.onBackground,
-                                textAlign = TextAlign.Center,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = buildString {
-                                    append("Fila ${selectedRow.value ?: ""}")
-                                    val spot = selectedSpot.value
-                                    if (spot != null) {
-                                        append("· Puesto $spot")
-                                    }
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = colors.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
+                            ParkLocationCard(
+                                floor = selectedFloor.value.orEmpty(),
+                                zone = selectedZone.value.orEmpty(),
+                                row = selectedRow.value.orEmpty(),
+                                spot = selectedSpot.value ?: noneSpotLabel,
                             )
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))
