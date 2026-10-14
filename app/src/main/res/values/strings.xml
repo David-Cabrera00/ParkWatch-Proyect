@@ -6,6 +6,8 @@
     <string name="home_empty_subtitle">Sin ubicación activa</string>
     <string name="home_view_vehicle">Ver vehículo</string>
     <string name="home_saved_title">Vehículo estacionado</string>
+    <string name="home_voice_input">Dictar por voz</string>
+    <string name="voice_prompt">Di piso, zona, fila y puesto</string>
     <string name="save_parking_title">Guardar ubicación</string>
     <string name="save_parking_floor_prompt">Selecciona el piso</string>
     <string name="save_parking_zone_prompt">Selecciona la zona</string>
@@ -64,6 +66,8 @@
     <string name="delete_confirm_subtitle">Se borrarán los datos guardados</string>
     <string name="delete_confirm_cancel">Cancelar</string>
     <string name="delete_confirm_delete">Eliminar</string>
+    <string name="detail_open_map">Ver en mapa</string>
+    <string name="save_parking_gps_captured">GPS guardado</string>
     <string-array name="save_parking_spot_options">
         <item>1</item>
         <item>2</item>

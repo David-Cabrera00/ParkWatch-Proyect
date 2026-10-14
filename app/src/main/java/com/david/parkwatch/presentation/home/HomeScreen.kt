@@ -20,6 +20,7 @@ import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 
@@ -28,6 +29,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     location: ParkingLocation? = null,
     onSaveVehicleClick: () -> Unit,
+    onVoiceClick: () -> Unit = {},
     onViewVehicleClick: () -> Unit = {},
 ) {
     val colors = parkColors()
@@ -87,6 +89,12 @@ fun HomeScreen(
                     ParkPrimaryButton(
                         onClick = onSaveVehicleClick,
                         label = stringResource(R.string.home_save_vehicle),
+                    )
+                }
+                item {
+                    ParkSecondaryButton(
+                        onClick = onVoiceClick,
+                        label = stringResource(R.string.home_voice_input),
                     )
                 }
             } else {

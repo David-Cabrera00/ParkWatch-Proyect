@@ -1,5 +1,8 @@
 package com.david.parkwatch.presentation.detail
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
@@ -37,6 +41,7 @@ fun ParkingDetailScreen(
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
+    val context = LocalContext.current
     val isConfirmingDelete = remember { mutableStateOf(false) }
 
     BackHandler {
@@ -101,6 +106,31 @@ fun ParkingDetailScreen(
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
+                }
+                if (location.latitude != null && location.longitude != null) {
+                    item {
+                        Text(
+                            text = "📍 " + stringResource(R.string.save_parking_gps_captured),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.secondary,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    item {
+                        ParkSecondaryButton(
+                            onClick = {
+                                val uri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehículo)")
+                                val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                try {
+                                    context.startActivity(mapIntent)
+                                } catch (_: ActivityNotFoundException) {
+                                }
+                            },
+                            label = stringResource(R.string.detail_open_map),
+                        )
+                    }
                 }
                 item {
                     Spacer(modifier = Modifier.size(spacing.SpaceSm))
