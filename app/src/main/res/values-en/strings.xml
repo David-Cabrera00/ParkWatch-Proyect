@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">ParkWatch</string>
+    <string name="location_zone">Zone</string>
+    <string name="location_row">Row</string>
+    <string name="location_spot">Spot</string>
+    <string name="home_brand">ParkWatch</string>
+    <string name="home_empty_title">Where did you park?</string>
+    <string name="home_save_vehicle">Save vehicle</string>
+    <string name="home_empty_subtitle">Save your location in seconds</string>
+    <string name="home_view_vehicle">View vehicle</string>
+    <string name="home_saved_title">Vehicle parked</string>
+    <string name="home_voice_input">Voice input</string>
+    <string name="voice_prompt">Say floor, zone, row and spot</string>
+    <string name="save_parking_title">Save location</string>
+    <string name="save_parking_floor_prompt">Select the floor</string>
+    <string name="save_parking_zone_prompt">Select the zone</string>
+    <string name="save_parking_row_prompt">Select the row</string>
+    <string name="save_parking_continue">Continue</string>
+    <string name="save_parking_step">Step %1$d of 4</string>
+    <string name="save_parking_spot_prompt">Spot (optional)</string>
+    <string name="save_parking_spot_skip">Skip</string>
+    <string name="save_parking_spot_none">No spot</string>
+    <string name="save_parking_review_title">Review your location</string>
+    <string name="save_parking_save">Save location</string>
+    <string name="save_parking_edit">Edit</string>
+    <string name="save_parking_success_title">Location saved!</string>
+    <string name="save_parking_success_subtitle">Your vehicle is registered</string>
+    <string name="save_parking_done">Done</string>
+    <string name="detail_title">Your vehicle</string>
+    <string name="detail_time_just_now">Parked just now</string>
+    <string name="detail_time_minutes">Parked %1$d min ago</string>
+    <string name="detail_time_hours_minutes">Parked %1$d h %2$d min ago</string>
+    <string name="detail_edit">Edit location</string>
+    <string name="detail_delete">Delete location</string>
+    <string name="delete_confirm_title">Delete location?</string>
+    <string name="delete_confirm_subtitle">Saved data will be removed</string>
+    <string name="delete_confirm_cancel">Cancel</string>
+    <string name="delete_confirm_delete">Delete</string>
+    <string name="detail_open_map">Open map</string>
+    <string name="save_parking_gps_captured">GPS location saved</string>
+    <string-array name="save_parking_floor_options">
+        <item>P1</item><item>P2</item><item>P3</item><item>B1</item><item>B2</item>
+    </string-array>
+    <string-array name="save_parking_zone_options">
+        <item>A</item><item>B</item><item>C</item><item>D</item>
+    </string-array>
+    <string-array name="save_parking_row_options">
+        <item>1</item><item>2</item><item>3</item><item>4</item><item>5</item>
+        <item>6</item><item>7</item><item>8</item><item>9</item><item>10</item>
+        <item>11</item><item>12</item><item>13</item><item>14</item><item>15</item>
+    </string-array>
+    <string-array name="save_parking_spot_options">
+        <item>1</item><item>2</item><item>3</item><item>4</item><item>5</item>
+        <item>6</item><item>7</item><item>8</item><item>9</item><item>10</item>
+        <item>11</item><item>12</item><item>13</item><item>14</item><item>15</item>
+        <item>16</item><item>17</item><item>18</item><item>19</item><item>20</item>
+        <item>21</item><item>22</item><item>23</item><item>24</item><item>25</item>
+        <item>26</item><item>27</item><item>28</item><item>29</item><item>30</item>
+    </string-array>
+</resources>

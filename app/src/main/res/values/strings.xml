@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">ParkWatch</string>
+    <string name="location_zone">Zona</string>
+    <string name="location_row">Fila</string>
+    <string name="location_spot">Puesto</string>
     <string name="home_brand">ParkWatch</string>
     <string name="home_empty_title">¿Dónde estacionaste?</string>
     <string name="home_save_vehicle">Guardar vehículo</string>

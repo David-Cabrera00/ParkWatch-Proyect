@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.MaterialTheme
@@ -50,11 +51,11 @@ fun ParkLocationCard(
             horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Zona", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(stringResource(com.david.parkwatch.R.string.location_zone), style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
                 Text(zone, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text("Fila", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(stringResource(com.david.parkwatch.R.string.location_row), style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
                 Text(row, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
             }
         }
@@ -63,7 +64,7 @@ fun ParkLocationCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
             ) {
-                Text("Puesto", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(stringResource(com.david.parkwatch.R.string.location_spot), style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
                 Text(
                     text = spot,
                     style = MaterialTheme.typography.titleSmall,
