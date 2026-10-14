@@ -11,15 +11,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.presentation.component.ParkLocationCard
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
@@ -54,6 +58,17 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (location == null) {
+                item {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_directions_car),
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = colors.primary,
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                }
                 item {
                     Text(
                         text = "ParkWatch",
@@ -107,22 +122,15 @@ fun HomeScreen(
                     )
                 }
                 item {
-                    Text(
-                        text = location.floor,
-                        style = MaterialTheme.typography.numeralMedium,
-                        color = colors.primary,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                item {
-                    Text(
-                        text = buildString {
-                            append("Zona ${location.zone} • Fila ${location.row}")
-                            location.spot?.let { append("\nPuesto $it") }
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.onBackground,
-                        textAlign = TextAlign.Center,
+                    val elapsedMinutes = ((System.currentTimeMillis() - location.parkedAt) / 60_000L)
+                        .coerceAtLeast(0L)
+                        .toInt()
+                    ParkLocationCard(
+                        floor = location.floor,
+                        zone = location.zone,
+                        row = location.row,
+                        spot = location.spot,
+                        elapsedTime = stringResource(R.string.detail_time_minutes, elapsedMinutes),
                     )
                 }
                 item {

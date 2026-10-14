@@ -13,6 +13,7 @@
     <string name="save_parking_zone_prompt">Selecciona la zona</string>
     <string name="save_parking_row_prompt">Selecciona la fila</string>
     <string name="save_parking_continue">Continuar</string>
+    <string name="save_parking_step">Paso %1$d de 4</string>
     <string-array name="save_parking_floor_options">
         <item>P1</item>
         <item>P2</item>

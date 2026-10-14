@@ -8,15 +8,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
@@ -78,6 +87,7 @@ fun SaveParkingScreen(
     val selectedZone = remember { mutableStateOf<String?>(initialLocation?.zone ?: initialParsed?.zone) }
     val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row ?: initialParsed?.row) }
     val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot ?: initialParsed?.spot) }
+    val haptic = LocalHapticFeedback.current
 
     val context = LocalContext.current
     val locationHelper = remember { LocationHelper(context) }
@@ -168,6 +178,12 @@ fun SaveParkingScreen(
                     item {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
+                                text = stringResource(R.string.save_parking_step, currentStep.value.ordinal + 1),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = colors.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
                                 text = stringResource(R.string.save_parking_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = colors.onBackground,
@@ -185,6 +201,32 @@ fun SaveParkingScreen(
                         }
                     }
 
+                    if (currentStep.value == SaveStep.ZONE) {
+                        item {
+                            Row(horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm)) {
+                                zones.forEach { option ->
+                                    Text(
+                                        text = option,
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clip(RoundedCornerShape(50))
+                                            .background(if (selectedZone.value == option) colors.primaryContainer else colors.surfaceContainer)
+                                            .selectable(
+                                                selected = selectedZone.value == option,
+                                                onClick = {
+                                                    selectedZone.value = option
+                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                },
+                                                role = Role.RadioButton,
+                                            )
+                                            .wrapContentSize(Alignment.Center),
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = if (selectedZone.value == option) colors.onPrimaryContainer else colors.onSurface,
+                                    )
+                                }
+                            }
+                        }
+                    } else {
                     items(options) { option ->
                         val isSelected = when (currentStep.value) {
                             SaveStep.FLOOR -> selectedFloor.value == option
@@ -194,6 +236,7 @@ fun SaveParkingScreen(
                         RadioButton(
                             selected = isSelected,
                             onSelect = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 when (currentStep.value) {
                                     SaveStep.FLOOR -> selectedFloor.value = option
                                     SaveStep.ZONE -> selectedZone.value = option
@@ -215,6 +258,7 @@ fun SaveParkingScreen(
                                 )
                             },
                         )
+                    }
                     }
 
                     item {
@@ -241,6 +285,12 @@ fun SaveParkingScreen(
                     item {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
+                                text = stringResource(R.string.save_parking_step, currentStep.value.ordinal + 1),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = colors.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
                                 text = stringResource(R.string.save_parking_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = colors.onBackground,
@@ -261,7 +311,10 @@ fun SaveParkingScreen(
                     item {
                         RadioButton(
                             selected = selectedSpot.value == null,
-                            onSelect = { selectedSpot.value = null },
+                            onSelect = {
+                                selectedSpot.value = null
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            },
                             colors = RadioButtonDefaults.radioButtonColors(
                                 selectedContainerColor = colors.primaryContainer,
                                 selectedContentColor = colors.onPrimaryContainer,
@@ -282,7 +335,10 @@ fun SaveParkingScreen(
                     items(spots) { spot ->
                         RadioButton(
                             selected = selectedSpot.value == spot,
-                            onSelect = { selectedSpot.value = spot },
+                            onSelect = {
+                                selectedSpot.value = spot
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            },
                             colors = RadioButtonDefaults.radioButtonColors(
                                 selectedContainerColor = colors.primaryContainer,
                                 selectedContentColor = colors.onPrimaryContainer,
@@ -328,7 +384,7 @@ fun SaveParkingScreen(
                             )
                             Spacer(modifier = Modifier.size(spacing.SpaceSm))
                             Text(
-                                text = "${selectedFloor.value ?: ""} • Zona ${selectedZone.value ?: ""}",
+                                text = "${selectedFloor.value ?: ""} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Zona ${selectedZone.value ?: ""}",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = colors.primary,
                                 textAlign = TextAlign.Center,
@@ -339,9 +395,9 @@ fun SaveParkingScreen(
                                     append("Fila ${selectedRow.value ?: ""}")
                                     val spot = selectedSpot.value
                                     if (spot != null) {
-                                        append(" • Puesto $spot")
+                                        append(" ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Puesto $spot")
                                     } else {
-                                        append(" • $noneSpotLabel")
+                                        append(" ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ $noneSpotLabel")
                                     }
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
@@ -351,7 +407,7 @@ fun SaveParkingScreen(
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))
                                 Text(
-                                    text = "📍 " + stringResource(R.string.save_parking_gps_captured),
+                                    text = "ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â " + stringResource(R.string.save_parking_gps_captured),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = colors.secondary,
                                     textAlign = TextAlign.Center,
@@ -415,7 +471,7 @@ fun SaveParkingScreen(
                             )
                             Spacer(modifier = Modifier.size(spacing.SpaceMd))
                             Text(
-                                text = "${selectedFloor.value ?: ""} • Zona ${selectedZone.value ?: ""}",
+                                text = "${selectedFloor.value ?: ""} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Zona ${selectedZone.value ?: ""}",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = colors.onBackground,
                                 textAlign = TextAlign.Center,
@@ -426,7 +482,7 @@ fun SaveParkingScreen(
                                     append("Fila ${selectedRow.value ?: ""}")
                                     val spot = selectedSpot.value
                                     if (spot != null) {
-                                        append(" • Puesto $spot")
+                                        append(" ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Puesto $spot")
                                     }
                                 },
                                 style = MaterialTheme.typography.bodySmall,
@@ -436,7 +492,7 @@ fun SaveParkingScreen(
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))
                                 Text(
-                                    text = "📍 " + stringResource(R.string.save_parking_gps_captured),
+                                    text = "ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â " + stringResource(R.string.save_parking_gps_captured),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = colors.secondary,
                                     textAlign = TextAlign.Center,
