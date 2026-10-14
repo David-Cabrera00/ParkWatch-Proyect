@@ -781,3 +781,113 @@ It must NOT feel like:
 - a website;
 - a medical application;
 - a compressed mobile app.
+
+---
+
+# 30. Visual Polish Pass
+
+The next design pass must make ParkWatch feel like a finished Wear OS product, not only a functional prototype.
+
+## 30.1 Home hierarchy
+
+### Empty state
+
+The empty Home state must contain:
+
+- a simple vehicle or parking icon inside a tonal circular container;
+- the short message `Where did you park?`;
+- a brief supporting line;
+- one dominant primary action: `Save vehicle`;
+- voice input as a visually quieter secondary action.
+
+### Saved state
+
+The saved Home state must prioritize the location card over navigation or decoration.
+
+The user must understand the following without opening Detail:
+
+1. floor;
+2. zone;
+3. row;
+4. parking spot, when available;
+5. elapsed parking time.
+
+## 30.2 ParkLocationCard direction
+
+`ParkLocationCard` is the main visual anchor of the saved state.
+
+Rules:
+
+- use `ParkSurface` as the tonal background;
+- use a rounded shape between 16.dp and 20.dp;
+- show the floor as the hero value in `ParkPrimary`;
+- group zone, row, and optional spot in a compact information row;
+- show elapsed time as supporting information inside the card;
+- keep the card centered inside the safe area of a round screen;
+- reuse the same hierarchy in Home, Review, and Detail.
+
+Avoid turning the card into a form or a collection of equal-weight labels.
+
+## 30.3 Save flow hierarchy
+
+The save flow must communicate progress and reduce mental effort:
+
+- show `Step X of 4` above the title;
+- optionally reinforce it with four subtle progress dots;
+- display one decision per screen;
+- use compact circular or pill selectors for four zones;
+- keep the primary CTA fixed as the final visual priority of each step;
+- provide light haptic feedback on selection and save;
+- use a review screen that visually matches `ParkLocationCard`.
+
+The four input steps are:
+
+1. floor;
+2. zone;
+3. row;
+4. optional parking spot.
+
+Review and confirmation are separate states, not additional input steps.
+
+## 30.4 Review and confirmation
+
+Review must show the exact information that will be stored:
+
+- use `ParkLocationCard` rather than loose centered text;
+- make `Save location` the only dominant action;
+- keep `Edit` secondary and tonal;
+- show GPS only as supporting metadata when available.
+
+Confirmation must be brief and reassuring:
+
+- use a check icon or equivalent Material icon;
+- use `ParkPrimary` for the success state;
+- show a short success message;
+- show a compact location summary;
+- provide one `Done` action returning to Home or Detail.
+
+## 30.5 Detail and destructive actions
+
+Detail must use the same location card as Home and Review.
+
+Actions follow this hierarchy:
+
+1. map or location information, when available;
+2. `Edit` as a secondary action;
+3. `Delete` separated from normal actions and using `ParkError`.
+
+Delete confirmation must clearly state the consequence and offer `Cancel` before `Delete`.
+
+## 30.6 Visual quality bar
+
+Before presenting the app, verify:
+
+- no mojibake or broken character encoding appears in Spanish text;
+- no emojis are used as production icons;
+- all icons belong to one visual family;
+- every primary action is obvious within one glance;
+- text does not compete with the location data;
+- screens remain balanced on a 384×384 round display;
+- selected, disabled, error, GPS, voice, and success states are visually distinct;
+- the design uses spacing and color tokens instead of one-off values;
+- TalkBack labels describe the action and not only the visual appearance.
