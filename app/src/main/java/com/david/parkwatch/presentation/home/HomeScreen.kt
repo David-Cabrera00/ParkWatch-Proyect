@@ -2,6 +2,7 @@ package com.david.parkwatch.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -11,10 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
@@ -59,19 +62,27 @@ fun HomeScreen(
         ) {
             if (location == null) {
                 item {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_directions_car),
-                        contentDescription = null,
-                        modifier = Modifier.size(32.dp),
-                        tint = colors.primary,
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(50))
+                            .background(colors.surfaceContainer),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_directions_car),
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = colors.primary,
+                        )
+                    }
                 }
                 item {
                     Spacer(modifier = Modifier.size(spacing.SpaceSm))
                 }
                 item {
                     Text(
-                        text = "ParkWatch",
+                        text = stringResource(R.string.home_brand),
                         style = MaterialTheme.typography.labelMedium,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,

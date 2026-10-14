@@ -92,7 +92,7 @@ fun ParkingDetailScreen(
                 if (location.latitude != null && location.longitude != null) {
                     item {
                         Text(
-                            text = "Ã°Å¸â€œÂ " + stringResource(R.string.save_parking_gps_captured),
+                            text = stringResource(R.string.save_parking_gps_captured),
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.secondary,
                             textAlign = TextAlign.Center,
@@ -101,7 +101,7 @@ fun ParkingDetailScreen(
                     item {
                         ParkSecondaryButton(
                             onClick = {
-                                val uri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(VehÃƒÂ­culo)")
+                                val uri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehicle)")
                                 val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
                                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 }

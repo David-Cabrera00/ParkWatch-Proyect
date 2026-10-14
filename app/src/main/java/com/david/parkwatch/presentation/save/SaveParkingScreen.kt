@@ -384,7 +384,7 @@ fun SaveParkingScreen(
                             )
                             Spacer(modifier = Modifier.size(spacing.SpaceSm))
                             Text(
-                                text = "${selectedFloor.value ?: ""} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Zona ${selectedZone.value ?: ""}",
+                                text = "${selectedFloor.value ?: ""} · Zona ${selectedZone.value ?: ""}",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = colors.primary,
                                 textAlign = TextAlign.Center,
@@ -395,9 +395,9 @@ fun SaveParkingScreen(
                                     append("Fila ${selectedRow.value ?: ""}")
                                     val spot = selectedSpot.value
                                     if (spot != null) {
-                                        append(" ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Puesto $spot")
+                                        append("· Puesto $spot")
                                     } else {
-                                        append(" ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ $noneSpotLabel")
+                                        append("· $noneSpotLabel")
                                     }
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
@@ -407,7 +407,7 @@ fun SaveParkingScreen(
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))
                                 Text(
-                                    text = "ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â " + stringResource(R.string.save_parking_gps_captured),
+                                    text = stringResource(R.string.save_parking_gps_captured),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = colors.secondary,
                                     textAlign = TextAlign.Center,
@@ -423,6 +423,7 @@ fun SaveParkingScreen(
                     item {
                         ParkPrimaryButton(
                             onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 val location = ParkingLocation(
                                     id = initialLocation?.id ?: UUID.randomUUID().toString(),
                                     floor = selectedFloor.value.orEmpty(),
@@ -471,7 +472,7 @@ fun SaveParkingScreen(
                             )
                             Spacer(modifier = Modifier.size(spacing.SpaceMd))
                             Text(
-                                text = "${selectedFloor.value ?: ""} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Zona ${selectedZone.value ?: ""}",
+                                text = "${selectedFloor.value ?: ""} · Zona ${selectedZone.value ?: ""}",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = colors.onBackground,
                                 textAlign = TextAlign.Center,
@@ -482,7 +483,7 @@ fun SaveParkingScreen(
                                     append("Fila ${selectedRow.value ?: ""}")
                                     val spot = selectedSpot.value
                                     if (spot != null) {
-                                        append(" ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Puesto $spot")
+                                        append("· Puesto $spot")
                                     }
                                 },
                                 style = MaterialTheme.typography.bodySmall,
@@ -492,7 +493,7 @@ fun SaveParkingScreen(
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))
                                 Text(
-                                    text = "ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â " + stringResource(R.string.save_parking_gps_captured),
+                                    text = stringResource(R.string.save_parking_gps_captured),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = colors.secondary,
                                     textAlign = TextAlign.Center,
