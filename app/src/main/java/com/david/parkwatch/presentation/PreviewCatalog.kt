@@ -60,3 +60,32 @@ fun SettingsPreview() {
         )
     }
 }
+
+@WearPreviewDevices
+@Composable
+fun SettingsLightPreview() {
+    ParkWatchTheme(darkTheme = false) {
+        SettingsScreen(
+            preferences = AppPreferences(
+                themeMode = ParkThemeMode.LIGHT,
+                language = ParkLanguage.ENGLISH,
+            ),
+            onThemeSelected = {},
+            onLanguageSelected = {},
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
+fun LongLocationCardPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        ParkLocationCard(
+            floor = "B12",
+            zone = "North-West",
+            row = "Row 148",
+            spot = "Parking spot 1204",
+            elapsedTime = "Parked 2 h 45 min ago",
+        )
+    }
+}
