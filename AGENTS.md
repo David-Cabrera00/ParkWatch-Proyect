@@ -23,10 +23,27 @@ Android Wear OS app (minSdk 30, targetSdk 37) using Jetpack Compose for Wear OS.
 ## Source Structure
 ```
 app/src/main/java/com/david/parkwatch/
-├── presentation/
-│   ├── MainActivity.kt          # Entry point, WearApp composable
-│   └── theme/
-│       └── Theme.kt             # ParkWatchTheme wraps MaterialTheme
+├── data/
+│   ├── location/                # LocationHelper (GPS)
+│   ├── preferences/             # AppPreferences & AppPreferencesStore
+│   ├── repository/              # ParkingRepository
+│   └── timer/                   # ParkingTimerManager & ParkingTimerReceiver
+├── domain/
+│   ├── model/                   # ParkingLocation
+│   └── parser/                  # VoiceParkingParser
+└── presentation/
+    ├── MainActivity.kt          # Entry point, WearApp composable
+    ├── PreviewCatalog.kt        # Previews catalog
+    ├── component/               # Reusable ParkWatch components (Buttons, Cards)
+    ├── home/                    # HomeScreen
+    ├── detail/                  # ParkingDetailScreen
+    ├── save/                    # SaveParkingScreen
+    ├── settings/                # SettingsScreen
+    ├── complication/            # Wear OS Complication DataSource & Manager
+    ├── tile/                    # Wear OS TileService & ParkWatchTileManager
+    ├── timer/                   # SetTimerScreen
+    ├── navigation/              # ParkWatchNavHost & routes
+    └── theme/                   # Theme, Color, Spacing
 ```
 
 ## Build Configuration
@@ -44,7 +61,8 @@ Reference: `design-system/parkwatch/MASTER.md`
 - Icons: Material Symbols only — no emojis
 - Components: Prefer shared ParkWatch components when they exist. Planned components include ParkPrimaryButton, ParkSecondaryButton, ParkIconButton, ParkLocationCard, ParkSelector, and ParkVoiceAction. Do not assume a planned component already exists; inspect the codebase first.
 ## Testing
-- No unit/instrumentation tests currently exist
+- Unit tests: Data layer (Repository, PreferencesStore) and Domain layer (VoiceParkingParser) in `app/src/test/`
+- Instrumentation / UI tests: Compose screen tests in `app/src/androidTest/`
 - Run `./gradlew testDebugUnitTest` for unit tests
 - Run `./gradlew connectedDebugAndroidTest` for device tests
 
