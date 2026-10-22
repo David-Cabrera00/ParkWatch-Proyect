@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -28,6 +29,7 @@ import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
 import com.david.parkwatch.presentation.component.ParkLocationCard
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
+import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 
@@ -36,12 +38,14 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     location: ParkingLocation? = null,
     onSaveVehicleClick: () -> Unit,
+    onQuickSaveClick: () -> Unit = {},
     onVoiceClick: () -> Unit = {},
     onViewVehicleClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
+    val listState = rememberScalingLazyListState()
 
     ScreenScaffold(
         modifier = modifier
@@ -49,9 +53,11 @@ fun HomeScreen(
             .background(colors.background),
     ) { contentPadding ->
         ScalingLazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding),
+                .padding(contentPadding)
+                .parkRotaryScroll(listState),
             contentPadding = PaddingValues(
                 top = spacing.SpaceMd,
                 bottom = spacing.SpaceXl,
@@ -120,6 +126,12 @@ fun HomeScreen(
                 }
                 item {
                     ParkSecondaryButton(
+                        onClick = onQuickSaveClick,
+                        label = stringResource(R.string.home_quick_save),
+                    )
+                }
+                item {
+                    ParkSecondaryButton(
                         onClick = onVoiceClick,
                         label = stringResource(R.string.home_voice_input),
                     )
@@ -140,15 +152,35 @@ fun HomeScreen(
                     )
                 }
                 item {
-                    val elapsedMinutes = ((System.currentTimeMillis() - location.parkedAt) / 60_000L)
+                    val now = System.currentTimeMillis()
+                    val elapsedMinutes = ((now - location.parkedAt) / 60_000L)
                         .coerceAtLeast(0L)
                         .toInt()
+                    val timerInfo = if (location.expiresAt != null) {
+                        val remaining = location.expiresAt - now
+                        if (remaining <= 0) {
+                            val expiredMin = ((-remaining) / 60_000L).coerceAtLeast(0L)
+                            stringResource(R.string.timer_expired_ago, expiredMin)
+                        } else {
+                            val remMin = (remaining / 60_000L).coerceAtLeast(0L)
+                            if (remMin < 60) {
+                                stringResource(R.string.timer_remaining_minutes, remMin)
+                            } else {
+                                stringResource(R.string.timer_remaining_hours_minutes, remMin / 60, remMin % 60)
+                            }
+                        }
+                    } else null
+
+                    val isExpired = location.expiresAt != null && now >= location.expiresAt
+
                     ParkLocationCard(
                         floor = location.floor,
                         zone = location.zone,
                         row = location.row,
                         spot = location.spot,
                         elapsedTime = stringResource(R.string.detail_time_minutes, elapsedMinutes),
+                        timerInfo = timerInfo,
+                        isTimerExpired = isExpired,
                     )
                 }
                 item {
