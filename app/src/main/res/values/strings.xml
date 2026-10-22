@@ -16,6 +16,7 @@
     <string name="home_brand">ParkWatch</string>
     <string name="home_empty_title">¿Dónde estacionaste?</string>
     <string name="home_save_vehicle">Guardar vehículo</string>
+    <string name="home_quick_save">Guardado rápido (GPS)</string>
     <string name="home_empty_subtitle">Guarda tu ubicación en segundos</string>
     <string name="home_view_vehicle">Ver vehículo</string>
     <string name="home_saved_title">Vehículo estacionado</string>
@@ -73,5 +74,45 @@
     <string name="delete_confirm_cancel">Cancelar</string>
     <string name="delete_confirm_delete">Eliminar</string>
     <string name="detail_open_map">Ver en mapa</string>
+    <string name="detail_share">Compartir ubicación</string>
+    <string name="share_location_title">Mi vehículo en ParkWatch:</string>
     <string name="save_parking_gps_captured">Ubicación GPS guardada</string>
+
+    <!-- Complication -->
+    <string name="complication_name">ParkWatch</string>
+    <string name="complication_description">Muestra el piso y zona de tu vehículo estacionado</string>
+    <string name="complication_empty_text">Auto</string>
+    <string name="complication_empty_title">Guardar</string>
+
+    <!-- Tile -->
+    <string name="tile_name">ParkWatch</string>
+    <string name="tile_description">Acceso rápido a tu vehículo estacionado</string>
+    <string name="tile_empty_title">¿Dónde estacionaste?</string>
+    <string name="tile_empty_action">Guardar auto</string>
+    <string name="tile_view_action">Ver detalle</string>
+
+    <!-- Timer -->
+    <string name="timer_title">Límite de tiempo</string>
+    <string name="timer_subtitle">Alerta de parquímetro</string>
+    <string name="timer_channel_name">Alerta de estacionamiento</string>
+    <string name="timer_channel_description">Notificaciones de tiempo límite de estacionamiento</string>
+    <string name="timer_set_button">Fijar tiempo límite</string>
+    <string name="timer_edit_button">Modificar límite</string>
+    <string name="timer_cancel_button">Quitar tiempo límite</string>
+    <string name="timer_remaining_minutes">Vence en %1$d min</string>
+    <string name="timer_remaining_hours_minutes">Vence en %1$d h %2$d min</string>
+    <string name="timer_expired">¡Tiempo vencido!</string>
+    <string name="timer_expired_ago">Venció hace %1$d min</string>
+    <string name="timer_expires_at">Límite: %1$s</string>
+    <string name="timer_notification_warning_title">ParkWatch: ¡Por vencer!</string>
+    <string name="timer_notification_warning_text">Tu tiempo de estacionamiento vence en 15 minutos</string>
+    <string name="timer_notification_expired_title">ParkWatch: ¡Tiempo vencido!</string>
+    <string name="timer_notification_expired_text">El tiempo límite de tu estacionamiento ha terminado</string>
+    <string name="timer_preset_15m">15 min</string>
+    <string name="timer_preset_30m">30 min</string>
+    <string name="timer_preset_45m">45 min</string>
+    <string name="timer_preset_1h">1 hora</string>
+    <string name="timer_preset_1h30">1 h 30 min</string>
+    <string name="timer_preset_2h">2 horas</string>
+    <string name="timer_preset_3h">3 horas</string>
 </resources>
