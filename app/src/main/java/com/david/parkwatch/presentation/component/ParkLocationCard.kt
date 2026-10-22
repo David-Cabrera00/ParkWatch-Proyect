@@ -27,6 +27,8 @@ fun ParkLocationCard(
     row: String,
     spot: String? = null,
     elapsedTime: String? = null,
+    timerInfo: String? = null,
+    isTimerExpired: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val colors = parkColors()
@@ -80,6 +82,16 @@ fun ParkLocationCard(
                 text = elapsedTime,
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        if (!timerInfo.isNullOrBlank()) {
+            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+            Text(
+                text = timerInfo,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (isTimerExpired) colors.error else colors.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
