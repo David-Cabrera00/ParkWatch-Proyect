@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.RadioButton
 import androidx.wear.compose.material3.RadioButtonDefaults
@@ -23,6 +24,7 @@ import com.david.parkwatch.R
 import com.david.parkwatch.data.preferences.AppPreferences
 import com.david.parkwatch.data.preferences.ParkLanguage
 import com.david.parkwatch.data.preferences.ParkThemeMode
+import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 
@@ -35,10 +37,15 @@ fun SettingsScreen(
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
+    val listState = rememberScalingLazyListState()
 
     ScreenScaffold(modifier = modifier.fillMaxSize().background(colors.background)) { contentPadding ->
         ScalingLazyColumn(
-            modifier = Modifier.fillMaxSize().padding(contentPadding),
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+                .parkRotaryScroll(listState),
             contentPadding = PaddingValues(vertical = spacing.SpaceLg, horizontal = spacing.SpaceMd),
             verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
             horizontalAlignment = Alignment.CenterHorizontally,
