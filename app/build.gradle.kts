@@ -34,6 +34,11 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -49,9 +54,19 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.wear.tooling.preview)
+    implementation(libs.wear.tiles)
+    implementation(libs.protolayout)
+    implementation(libs.protolayout.material)
+    implementation(libs.protolayout.expression)
+    implementation(libs.concurrent.futures)
+    implementation(libs.wear.watchface.complications)
+    debugImplementation(libs.wear.tiles.tooling.preview)
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
     debugImplementation(libs.ui.test.manifest)
     debugImplementation(libs.ui.tooling)
 }
