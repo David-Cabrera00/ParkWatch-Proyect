@@ -16,6 +16,7 @@
     <string name="home_brand">ParkWatch</string>
     <string name="home_empty_title">Where did you park?</string>
     <string name="home_save_vehicle">Save vehicle</string>
+    <string name="home_quick_save">Quick save (GPS)</string>
     <string name="home_empty_subtitle">Save your location in seconds</string>
     <string name="home_view_vehicle">View vehicle</string>
     <string name="home_saved_title">Vehicle parked</string>
@@ -31,6 +32,10 @@
     <string name="save_parking_spot_skip">Skip</string>
     <string name="save_parking_spot_none">No spot</string>
     <string name="save_parking_review_title">Review your location</string>
+    <string name="save_parking_floor_label">Floor</string>
+    <string name="save_parking_zone_label">Zone</string>
+    <string name="save_parking_row_label">Row</string>
+    <string name="save_parking_spot_label">Spot</string>
     <string name="save_parking_save">Save location</string>
     <string name="save_parking_edit">Edit</string>
     <string name="save_parking_success_title">Location saved!</string>
@@ -47,6 +52,8 @@
     <string name="delete_confirm_cancel">Cancel</string>
     <string name="delete_confirm_delete">Delete</string>
     <string name="detail_open_map">Open map</string>
+    <string name="detail_share">Share location</string>
+    <string name="share_location_title">My vehicle in ParkWatch:</string>
     <string name="save_parking_gps_captured">GPS location saved</string>
     <string-array name="save_parking_floor_options">
         <item>P1</item><item>P2</item><item>P3</item><item>B1</item><item>B2</item>
@@ -67,4 +74,42 @@
         <item>21</item><item>22</item><item>23</item><item>24</item><item>25</item>
         <item>26</item><item>27</item><item>28</item><item>29</item><item>30</item>
     </string-array>
+
+    <!-- Complication -->
+    <string name="complication_name">ParkWatch</string>
+    <string name="complication_description">Displays the floor and zone of your parked vehicle</string>
+    <string name="complication_empty_text">Car</string>
+    <string name="complication_empty_title">Save</string>
+
+    <!-- Tile -->
+    <string name="tile_name">ParkWatch</string>
+    <string name="tile_description">Quick glance at your parked vehicle</string>
+    <string name="tile_empty_title">Where did you park?</string>
+    <string name="tile_empty_action">Save vehicle</string>
+    <string name="tile_view_action">View detail</string>
+
+    <!-- Timer -->
+    <string name="timer_title">Time limit</string>
+    <string name="timer_subtitle">Parking meter alert</string>
+    <string name="timer_channel_name">Parking alert</string>
+    <string name="timer_channel_description">Parking time limit notifications</string>
+    <string name="timer_set_button">Set time limit</string>
+    <string name="timer_edit_button">Edit time limit</string>
+    <string name="timer_cancel_button">Remove time limit</string>
+    <string name="timer_remaining_minutes">Expires in %1$d min</string>
+    <string name="timer_remaining_hours_minutes">Expires in %1$d h %2$d min</string>
+    <string name="timer_expired">Time expired!</string>
+    <string name="timer_expired_ago">Expired %1$d min ago</string>
+    <string name="timer_expires_at">Limit: %1$s</string>
+    <string name="timer_notification_warning_title">ParkWatch: Expiring soon!</string>
+    <string name="timer_notification_warning_text">Your parking time expires in 15 minutes</string>
+    <string name="timer_notification_expired_title">ParkWatch: Time expired!</string>
+    <string name="timer_notification_expired_text">Your parking time limit has expired</string>
+    <string name="timer_preset_15m">15 min</string>
+    <string name="timer_preset_30m">30 min</string>
+    <string name="timer_preset_45m">45 min</string>
+    <string name="timer_preset_1h">1 hour</string>
+    <string name="timer_preset_1h30">1 h 30 min</string>
+    <string name="timer_preset_2h">2 hours</string>
+    <string name="timer_preset_3h">3 hours</string>
 </resources>
