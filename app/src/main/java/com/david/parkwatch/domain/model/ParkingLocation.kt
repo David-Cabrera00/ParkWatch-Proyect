@@ -9,6 +9,7 @@ data class ParkingLocation(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val parkedAt: Long,
+    val expiresAt: Long? = null,
     val createdAt: Long,
     val updatedAt: Long,
 )
