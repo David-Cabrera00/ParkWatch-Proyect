@@ -60,3 +60,59 @@ fun SettingsPreview() {
         )
     }
 }
+
+@WearPreviewDevices
+@Composable
+fun SettingsLightPreview() {
+    ParkWatchTheme(darkTheme = false) {
+        SettingsScreen(
+            preferences = AppPreferences(
+                themeMode = ParkThemeMode.LIGHT,
+                language = ParkLanguage.ENGLISH,
+            ),
+            onThemeSelected = {},
+            onLanguageSelected = {},
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
+fun LongLocationCardPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        ParkLocationCard(
+            floor = "B12",
+            zone = "North-West",
+            row = "Row 148",
+            spot = "Parking spot 1204",
+            elapsedTime = "Parked 2 h 45 min ago",
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
+fun SetTimerPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        com.david.parkwatch.presentation.timer.SetTimerScreen(
+            currentExpiresAt = System.currentTimeMillis() + 45 * 60 * 1000L,
+            onSetTimer = {},
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
+fun LocationCardWithTimerPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        ParkLocationCard(
+            floor = "P2",
+            zone = "B",
+            row = "14",
+            spot = "27",
+            elapsedTime = "Estacionado hace 25 min",
+            timerInfo = "Vence en 35 min",
+            isTimerExpired = false,
+        )
+    }
+}

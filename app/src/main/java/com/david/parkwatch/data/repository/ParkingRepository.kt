@@ -15,6 +15,7 @@ class ParkingRepository(context: Context) {
         val latitude = if (prefs.contains("latitude")) prefs.getFloat("latitude", 0f).toDouble() else null
         val longitude = if (prefs.contains("longitude")) prefs.getFloat("longitude", 0f).toDouble() else null
         val parkedAt = prefs.getLong("parkedAt", 0L)
+        val expiresAt = if (prefs.contains("expiresAt")) prefs.getLong("expiresAt", 0L) else null
         val createdAt = prefs.getLong("createdAt", 0L)
         val updatedAt = prefs.getLong("updatedAt", 0L)
 
@@ -27,6 +28,7 @@ class ParkingRepository(context: Context) {
             latitude = latitude,
             longitude = longitude,
             parkedAt = parkedAt,
+            expiresAt = expiresAt,
             createdAt = createdAt,
             updatedAt = updatedAt,
         )
@@ -49,6 +51,11 @@ class ParkingRepository(context: Context) {
                     putFloat("longitude", location.longitude.toFloat())
                 } else {
                     remove("longitude")
+                }
+                if (location.expiresAt != null) {
+                    putLong("expiresAt", location.expiresAt)
+                } else {
+                    remove("expiresAt")
                 }
             }
             .putLong("parkedAt", location.parkedAt)

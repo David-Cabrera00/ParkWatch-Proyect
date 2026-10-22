@@ -16,6 +16,7 @@ Represents the vehicle's currently saved parking location.
 | latitude | Double? | No | Optional GPS latitude |
 | longitude | Double? | No | Optional GPS longitude |
 | parkedAt | Long | Yes | Timestamp when the location was saved |
+| expiresAt | Long? | No | Optional parking expiration timestamp (timer) |
 | createdAt | Long | Yes | Creation timestamp |
 | updatedAt | Long | Yes | Last modification timestamp |
 
@@ -33,6 +34,8 @@ data class ParkingLocation(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val parkedAt: Long,
+    val expiresAt: Long? = null,
     val createdAt: Long,
     val updatedAt: Long
 )
+```

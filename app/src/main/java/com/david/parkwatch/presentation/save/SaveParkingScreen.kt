@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.RadioButton
 import androidx.wear.compose.material3.RadioButtonDefaults
@@ -43,6 +44,7 @@ import com.david.parkwatch.data.location.LocationHelper
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.parser.ParsedParkingInfo
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.component.ParkLocationCard
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.theme.parkColors
@@ -89,6 +91,11 @@ fun SaveParkingScreen(
     val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row ?: initialParsed?.row) }
     val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot ?: initialParsed?.spot) }
     val haptic = LocalHapticFeedback.current
+    val listState = rememberScalingLazyListState()
+
+    LaunchedEffect(currentStep.value) {
+        listState.scrollToItem(0)
+    }
 
     val context = LocalContext.current
     val locationHelper = remember { LocationHelper(context) }
@@ -153,9 +160,11 @@ fun SaveParkingScreen(
             .background(colors.background),
     ) { contentPadding ->
         ScalingLazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding),
+                .padding(contentPadding)
+                .parkRotaryScroll(listState),
             contentPadding = PaddingValues(
                 vertical = spacing.SpaceLg,
                 horizontal = spacing.SpaceMd,
