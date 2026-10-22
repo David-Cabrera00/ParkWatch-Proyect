@@ -89,3 +89,30 @@ fun LongLocationCardPreview() {
         )
     }
 }
+
+@WearPreviewDevices
+@Composable
+fun SetTimerPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        com.david.parkwatch.presentation.timer.SetTimerScreen(
+            currentExpiresAt = System.currentTimeMillis() + 45 * 60 * 1000L,
+            onSetTimer = {},
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
+fun LocationCardWithTimerPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        ParkLocationCard(
+            floor = "P2",
+            zone = "B",
+            row = "14",
+            spot = "27",
+            elapsedTime = "Estacionado hace 25 min",
+            timerInfo = "Vence en 35 min",
+            isTimerExpired = false,
+        )
+    }
+}
