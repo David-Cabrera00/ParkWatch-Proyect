@@ -47,9 +47,9 @@
     <string name="save_parking_success_subtitle">Your vehicle is registered</string>
     <string name="save_parking_done">Done</string>
     <string name="detail_title">Your vehicle</string>
-    <string name="detail_time_just_now">Parked just now</string>
-    <string name="detail_time_minutes">Parked %1$d min ago</string>
-    <string name="detail_time_hours_minutes">Parked %1$d h %2$d min ago</string>
+    <string name="detail_time_just_now">Just now</string>
+    <string name="detail_time_minutes">%1$d min ago</string>
+    <string name="detail_time_hours_minutes">%1$d h %2$d min ago</string>
     <string name="detail_edit">Edit location</string>
     <string name="detail_delete">Delete location</string>
     <string name="delete_confirm_title">Delete location?</string>
@@ -58,8 +58,26 @@
     <string name="delete_confirm_delete">Delete</string>
     <string name="detail_open_map">Open map</string>
     <string name="detail_share">Share location</string>
+    <string name="detail_share_copied">Location copied to clipboard</string>
     <string name="share_location_title">My vehicle in ParkWatch:</string>
     <string name="save_parking_gps_captured">GPS location saved</string>
+
+    <!-- Compass / Offline Guidance -->
+    <string name="compass_title">Compass</string>
+    <string name="compass_guide_me">Guide to vehicle</string>
+    <string name="compass_heading_to">Heading to your %1$s</string>
+    <string name="compass_waiting_gps">Searching GPS signal…</string>
+    <string name="compass_arrived">You reached your vehicle!</string>
+    <string name="compass_distance_meters">%1$d m</string>
+    <string name="compass_distance_km">%1$.1f km</string>
+    <string name="compass_dir_n">North</string>
+    <string name="compass_dir_ne">Northeast</string>
+    <string name="compass_dir_e">East</string>
+    <string name="compass_dir_se">Southeast</string>
+    <string name="compass_dir_s">South</string>
+    <string name="compass_dir_sw">Southwest</string>
+    <string name="compass_dir_w">West</string>
+    <string name="compass_dir_nw">Northwest</string>
     <string-array name="save_parking_floor_options">
         <item>P1</item><item>P2</item><item>P3</item><item>B1</item><item>B2</item>
     </string-array>
