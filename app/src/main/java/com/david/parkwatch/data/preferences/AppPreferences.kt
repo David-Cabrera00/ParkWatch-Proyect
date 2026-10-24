@@ -12,7 +12,15 @@ enum class ParkLanguage {
     ENGLISH,
 }
 
+enum class ParkAccentColor {
+    EMERALD,
+    CYAN,
+    AMBER,
+    RUBY,
+}
+
 data class AppPreferences(
     val themeMode: ParkThemeMode = ParkThemeMode.SYSTEM,
     val language: ParkLanguage = ParkLanguage.SYSTEM,
+    val accentColor: ParkAccentColor = ParkAccentColor.EMERALD,
 )

@@ -13,6 +13,9 @@ class AppPreferencesStore(context: Context) {
             language = preferences.getString(KEY_LANGUAGE, null)
                 ?.let { value -> ParkLanguage.entries.firstOrNull { it.name == value } }
                 ?: ParkLanguage.SYSTEM,
+            accentColor = preferences.getString(KEY_ACCENT, null)
+                ?.let { value -> ParkAccentColor.entries.firstOrNull { it.name == value } }
+                ?: ParkAccentColor.EMERALD,
         )
     }
 
@@ -20,6 +23,7 @@ class AppPreferencesStore(context: Context) {
         this.preferences.edit()
             .putString(KEY_THEME, preferences.themeMode.name)
             .putString(KEY_LANGUAGE, preferences.language.name)
+            .putString(KEY_ACCENT, preferences.accentColor.name)
             .apply()
     }
 
@@ -27,5 +31,6 @@ class AppPreferencesStore(context: Context) {
         const val FILE_NAME = "parkwatch_preferences"
         const val KEY_THEME = "theme_mode"
         const val KEY_LANGUAGE = "language"
+        const val KEY_ACCENT = "accent_color"
     }
 }
