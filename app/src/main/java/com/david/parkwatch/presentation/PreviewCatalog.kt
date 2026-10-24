@@ -103,6 +103,21 @@ fun SetTimerPreview() {
 
 @WearPreviewDevices
 @Composable
+fun MotorcycleLocationCardPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        ParkLocationCard(
+            floor = "P1",
+            zone = "M",
+            row = "3",
+            spot = "12",
+            vehicleType = com.david.parkwatch.domain.model.VehicleType.MOTORCYCLE,
+            elapsedTime = "Estacionado hace 10 min",
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
 fun LocationCardWithTimerPreview() {
     ParkWatchTheme(darkTheme = true) {
         ParkLocationCard(
