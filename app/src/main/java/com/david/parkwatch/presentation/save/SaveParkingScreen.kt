@@ -171,8 +171,10 @@ fun SaveParkingScreen(
                 .padding(contentPadding)
                 .parkRotaryScroll(listState),
             contentPadding = PaddingValues(
-                vertical = spacing.SpaceLg,
-                horizontal = spacing.SpaceMd,
+                top = 28.dp,
+                bottom = 48.dp,
+                start = 14.dp,
+                end = 14.dp,
             ),
             verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
             horizontalAlignment = Alignment.CenterHorizontally,
