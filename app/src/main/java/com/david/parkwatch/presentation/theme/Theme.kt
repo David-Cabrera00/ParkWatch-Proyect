@@ -9,13 +9,15 @@ import androidx.wear.compose.material3.ColorScheme
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Shapes
 import androidx.wear.compose.material3.Typography
+import com.david.parkwatch.data.preferences.ParkAccentColor
 
 @Composable
 fun ParkWatchTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    accentColor: ParkAccentColor = ParkAccentColor.EMERALD,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = remember(darkTheme) { ParkWatchColorScheme(darkTheme) }
+    val colorScheme = remember(darkTheme, accentColor) { ParkWatchColorScheme(darkTheme, accentColor) }
     val typography = Typography()
     val shapes = Shapes()
 
@@ -32,23 +34,57 @@ fun ParkWatchTheme(
     }
 }
 
-private fun ParkWatchColorScheme(darkTheme: Boolean): ColorScheme {
+private data class AccentColors(
+    val primary: Color,
+    val onPrimary: Color,
+    val primaryContainer: Color,
+    val onPrimaryContainer: Color,
+)
+
+private fun getAccentColors(accentColor: ParkAccentColor, darkTheme: Boolean): AccentColors {
+    return when (accentColor) {
+        ParkAccentColor.EMERALD -> if (darkTheme) {
+            AccentColors(ParkColors.ParkPrimary, ParkColors.ParkOnPrimary, ParkColors.ParkPrimaryContainer, ParkColors.ParkOnPrimaryContainer)
+        } else {
+            AccentColors(Color(0xFF166534), Color.White, Color(0xFFC0ECCB), Color(0xFF0F3B1F))
+        }
+        ParkAccentColor.CYAN -> if (darkTheme) {
+            AccentColors(Color(0xFF5CE1E6), Color(0xFF002022), Color(0xFF00373A), Color(0xFFA6F5F8))
+        } else {
+            AccentColors(Color(0xFF0E7490), Color.White, Color(0xFFBAE6FD), Color(0xFF082F49))
+        }
+        ParkAccentColor.AMBER -> if (darkTheme) {
+            AccentColors(Color(0xFFFFB74D), Color(0xFF261800), Color(0xFF4A3000), Color(0xFFFFE0B2))
+        } else {
+            AccentColors(Color(0xFFB45309), Color.White, Color(0xFFFED7AA), Color(0xFF451A03))
+        }
+        ParkAccentColor.RUBY -> if (darkTheme) {
+            AccentColors(Color(0xFFFF6565), Color(0xFF2B0000), Color(0xFF520B0B), Color(0xFFFFCDCD))
+        } else {
+            AccentColors(Color(0xFFB91C1C), Color.White, Color(0xFFFECACA), Color(0xFF450A0A))
+        }
+    }
+}
+
+private fun ParkWatchColorScheme(darkTheme: Boolean, accentColor: ParkAccentColor): ColorScheme {
     val palette = if (darkTheme) DarkPalette else LightPalette
+    val accents = getAccentColors(accentColor, darkTheme)
+
     return ColorScheme(
-        primary = palette.primary,
-        onPrimary = palette.onPrimary,
-        primaryContainer = palette.primaryContainer,
-        onPrimaryContainer = palette.onPrimaryContainer,
+        primary = accents.primary,
+        onPrimary = accents.onPrimary,
+        primaryContainer = accents.primaryContainer,
+        onPrimaryContainer = accents.onPrimaryContainer,
         secondary = palette.secondary,
         onSecondary = palette.onSecondary,
         tertiary = palette.secondary,
         onTertiary = palette.onSecondary,
-        tertiaryContainer = palette.primaryContainer,
-        onTertiaryContainer = palette.onPrimaryContainer,
+        tertiaryContainer = accents.primaryContainer,
+        onTertiaryContainer = accents.onPrimaryContainer,
         error = palette.error,
-        onError = palette.onPrimary,
-        errorContainer = palette.primaryContainer,
-        onErrorContainer = palette.onPrimaryContainer,
+        onError = accents.onPrimary,
+        errorContainer = accents.primaryContainer,
+        onErrorContainer = accents.onPrimaryContainer,
         background = palette.background,
         onBackground = palette.textPrimary,
         onSurface = palette.textPrimary,
