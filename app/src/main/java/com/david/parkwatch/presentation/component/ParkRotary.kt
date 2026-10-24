@@ -1,10 +1,12 @@
 package com.david.parkwatch.presentation.component
 
+import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
@@ -21,9 +23,12 @@ fun Modifier.parkRotaryScroll(listState: ScalingLazyListState): Modifier {
         focusRequester.requestFocus()
     }
 
-    return this.rotaryScrollable(
-        behavior = RotaryScrollableDefaults.snapBehavior(listState),
-        focusRequester = focusRequester,
-    )
+    return this
+        .focusRequester(focusRequester)
+        .focusable()
+        .rotaryScrollable(
+            behavior = RotaryScrollableDefaults.snapBehavior(listState),
+            focusRequester = focusRequester,
+        )
 }
 

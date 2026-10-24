@@ -215,6 +215,52 @@ fun CompassScreen(
                     label = stringResource(R.string.delete_confirm_cancel),
                 )
             }
+        } else if (isArrived) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding)
+                    .padding(horizontal = 14.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(52.dp)
+                        .clip(CircleShape)
+                        .background(colors.primaryContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(vehicleType.iconRes),
+                        contentDescription = stringResource(vehicleType.labelRes),
+                        modifier = Modifier.size(28.dp),
+                        tint = colors.onPrimaryContainer,
+                    )
+                }
+                Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                Text(
+                    text = stringResource(R.string.compass_arrived_destination, stringResource(vehicleType.labelRes)),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.primary,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                )
+                Text(
+                    text = stringResource(R.string.compass_arrived_short),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.size(spacing.SpaceMd))
+                ParkPrimaryButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        isConfirmingFinish = true
+                    },
+                    label = stringResource(R.string.compass_free_spot),
+                )
+            }
         } else {
             Box(
                 modifier = Modifier
@@ -225,7 +271,7 @@ fun CompassScreen(
                 // Dial Canvas: Outer circle, cardinal ticks and needle
                 CompassDial(
                     needleAngle = animatedAngle,
-                    isArrived = isArrived,
+                    isArrived = false,
                     primaryColor = colors.primary,
                     secondaryColor = colors.secondary,
                     surfaceColor = colors.surfaceContainer,
@@ -249,7 +295,7 @@ fun CompassScreen(
                         painter = painterResource(vehicleType.iconRes),
                         contentDescription = stringResource(vehicleType.labelRes),
                         modifier = Modifier.size(20.dp),
-                        tint = if (isArrived) colors.primary else colors.onSurface,
+                        tint = colors.onSurface,
                     )
                 }
 
@@ -257,17 +303,13 @@ fun CompassScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 14.dp, vertical = 18.dp),
+                        .padding(horizontal = 14.dp, vertical = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween,
                 ) {
                     // Header
                     Text(
-                        text = if (isArrived) {
-                            stringResource(R.string.compass_arrived_destination, stringResource(vehicleType.labelRes))
-                        } else {
-                            stringResource(R.string.compass_heading_to, stringResource(vehicleType.labelRes))
-                        },
+                        text = stringResource(R.string.compass_heading_to, stringResource(vehicleType.labelRes)),
                         style = MaterialTheme.typography.labelMedium,
                         color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -281,59 +323,39 @@ fun CompassScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
-                        when {
-                            isArrived -> {
-                                Text(
-                                    text = stringResource(R.string.compass_arrived_short),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = colors.primary,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                )
-                                Spacer(modifier = Modifier.size(2.dp))
-                                ParkPrimaryButton(
-                                    onClick = {
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        isConfirmingFinish = true
-                                    },
-                                    label = stringResource(R.string.compass_free_spot),
-                                )
+                        if (distanceMeters != null) {
+                            val dist = distanceMeters!!
+                            val formattedDist = if (dist < 1000f) {
+                                stringResource(R.string.compass_distance_meters, dist.toInt())
+                            } else {
+                                stringResource(R.string.compass_distance_km, dist / 1000f)
                             }
-                            distanceMeters != null -> {
-                                val dist = distanceMeters!!
-                                val formattedDist = if (dist < 1000f) {
-                                    stringResource(R.string.compass_distance_meters, dist.toInt())
-                                } else {
-                                    stringResource(R.string.compass_distance_km, dist / 1000f)
-                                }
+                            Text(
+                                text = formattedDist,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = colors.primary,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                            )
+                            val cardinalKey = targetBearing?.let { LocationHelper.getCardinalDirectionKey(it) }
+                            val cardinalString = cardinalKey?.let { getCardinalString(it) }.orEmpty()
+                            if (cardinalString.isNotBlank()) {
                                 Text(
-                                    text = formattedDist,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = colors.primary,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                )
-                                val cardinalKey = targetBearing?.let { LocationHelper.getCardinalDirectionKey(it) }
-                                val cardinalString = cardinalKey?.let { getCardinalString(it) }.orEmpty()
-                                if (cardinalString.isNotBlank()) {
-                                    Text(
-                                        text = cardinalString,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = colors.onSurfaceVariant,
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 1,
-                                    )
-                                }
-                            }
-                            else -> {
-                                Text(
-                                    text = stringResource(R.string.compass_waiting_gps),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    text = cardinalString,
+                                    style = MaterialTheme.typography.labelSmall,
                                     color = colors.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1,
                                 )
                             }
+                        } else {
+                            Text(
+                                text = stringResource(R.string.compass_waiting_gps),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                            )
                         }
                     }
                 }
