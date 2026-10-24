@@ -258,6 +258,10 @@ fun HomeScreen(
                     } else null
 
                     val isExpired = location.expiresAt != null && now >= location.expiresAt
+                    val timerProgress = if (location.expiresAt != null) {
+                        val totalDuration = (location.expiresAt - location.parkedAt).coerceAtLeast(1L)
+                        ((location.expiresAt - now).toFloat() / totalDuration).coerceIn(0f, 1f)
+                    } else null
 
                     ParkLocationCard(
                         floor = location.floor,
@@ -267,6 +271,7 @@ fun HomeScreen(
                         vehicleType = location.vehicleType,
                         elapsedTime = TimeFormatter.formatElapsedTime(location.parkedAt, context),
                         timerInfo = timerInfo,
+                        timerProgress = timerProgress,
                         isTimerExpired = isExpired,
                         onClick = onViewVehicleClick,
                     )
