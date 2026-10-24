@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.LocaleManager
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +28,8 @@ import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
+    private val destinationState = mutableStateOf<String?>(null)
+
     override fun attachBaseContext(newBase: Context) {
         val store = AppPreferencesStore(newBase)
         val preferences = store.read()
@@ -36,14 +39,30 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        destinationState.value = intent?.getStringExtra(EXTRA_DESTINATION)
         setContent {
-            WearApp()
+            WearApp(destination = destinationState.value)
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        destinationState.value = intent.getStringExtra(EXTRA_DESTINATION)
+    }
+
+    companion object {
+        const val EXTRA_DESTINATION = "extra_destination"
+        const val DESTINATION_COMPASS = "compass"
+        const val DESTINATION_DETAIL = "detail"
+        const val DESTINATION_SAVE = "save"
+        const val DESTINATION_TIMER = "timer"
+        const val DESTINATION_HISTORY = "history"
     }
 }
 
 @Composable
-fun WearApp() {
+fun WearApp(destination: String? = null) {
     val context = LocalContext.current
     val store = remember { AppPreferencesStore(context) }
     var preferences by remember { mutableStateOf(store.read()) }
@@ -56,6 +75,7 @@ fun WearApp() {
     ParkWatchTheme(darkTheme = darkTheme) {
         ParkWatchNavHost(
             preferences = preferences,
+            destination = destination,
             onPreferencesChanged = { updated ->
                 val languageChanged = updated.language != preferences.language
                 store.save(updated)
