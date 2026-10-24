@@ -2,6 +2,7 @@ package com.david.parkwatch.data.repository
 
 import android.content.Context
 import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.domain.model.VehicleType
 
 class ParkingRepository(context: Context) {
     private val prefs = context.getSharedPreferences("parkwatch_prefs", Context.MODE_PRIVATE)
@@ -16,6 +17,7 @@ class ParkingRepository(context: Context) {
         val longitude = if (prefs.contains("longitude")) prefs.getFloat("longitude", 0f).toDouble() else null
         val parkedAt = prefs.getLong("parkedAt", 0L)
         val expiresAt = if (prefs.contains("expiresAt")) prefs.getLong("expiresAt", 0L) else null
+        val vehicleType = VehicleType.fromString(prefs.getString("vehicleType", null))
         val createdAt = prefs.getLong("createdAt", 0L)
         val updatedAt = prefs.getLong("updatedAt", 0L)
 
@@ -29,6 +31,7 @@ class ParkingRepository(context: Context) {
             longitude = longitude,
             parkedAt = parkedAt,
             expiresAt = expiresAt,
+            vehicleType = vehicleType,
             createdAt = createdAt,
             updatedAt = updatedAt,
         )
@@ -41,6 +44,7 @@ class ParkingRepository(context: Context) {
             .putString("zone", location.zone)
             .putString("row", location.row)
             .putString("spot", location.spot)
+            .putString("vehicleType", location.vehicleType.name)
             .apply {
                 if (location.latitude != null) {
                     putFloat("latitude", location.latitude.toFloat())
