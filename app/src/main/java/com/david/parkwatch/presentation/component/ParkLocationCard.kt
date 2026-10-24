@@ -1,6 +1,7 @@
 package com.david.parkwatch.presentation.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.MaterialTheme
@@ -36,17 +38,29 @@ fun ParkLocationCard(
     elapsedTime: String? = null,
     timerInfo: String? = null,
     isTimerExpired: Boolean = false,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
 
-    Column(
-        modifier = modifier
+    val cardModifier = if (onClick != null) {
+        modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .background(colors.surfaceContainer)
+            .padding(horizontal = 14.dp, vertical = 12.dp)
+    } else {
+        modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(colors.surfaceContainer)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 14.dp, vertical = 12.dp)
+    }
+
+    Column(
+        modifier = cardModifier,
         verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
     ) {
         Row(
@@ -83,30 +97,62 @@ fun ParkLocationCard(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(com.david.parkwatch.R.string.location_zone), style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
-                Text(zone, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(com.david.parkwatch.R.string.location_row), style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
-                Text(row, style = MaterialTheme.typography.titleSmall, color = colors.onSurface, maxLines = 1)
-            }
-        }
-        if (!spot.isNullOrBlank()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.Start,
             ) {
-                Text(stringResource(com.david.parkwatch.R.string.location_spot), style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant, maxLines = 1)
                 Text(
-                    text = spot,
-                    style = MaterialTheme.typography.titleSmall,
+                    text = stringResource(com.david.parkwatch.R.string.location_zone),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                )
+                Text(
+                    text = zone,
+                    style = MaterialTheme.typography.titleMedium,
                     color = colors.onSurface,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                 )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Text(
+                    text = stringResource(com.david.parkwatch.R.string.location_row),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                )
+                Text(
+                    text = row,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.onSurface,
+                    maxLines = 1,
+                )
+            }
+            if (!spot.isNullOrBlank()) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Text(
+                        text = stringResource(com.david.parkwatch.R.string.location_spot),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+                    Text(
+                        text = spot,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
         if (!elapsedTime.isNullOrBlank()) {
