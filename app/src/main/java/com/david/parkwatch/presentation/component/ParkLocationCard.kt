@@ -44,9 +44,9 @@ fun ParkLocationCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(colors.surfaceContainer)
-            .padding(spacing.SpaceMd),
+            .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
     ) {
         Row(
@@ -56,7 +56,7 @@ fun ParkLocationCard(
         ) {
             Text(
                 text = floor,
-                style = MaterialTheme.typography.numeralLarge,
+                style = MaterialTheme.typography.displaySmall,
                 color = colors.primary,
                 maxLines = 1,
             )
@@ -66,7 +66,7 @@ fun ParkLocationCard(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .background(colors.surfaceContainerHigh)
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
             ) {
                 Icon(
                     painter = painterResource(vehicleType.iconRes),
@@ -115,7 +115,7 @@ fun ParkLocationCard(
                 text = elapsedTime,
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.onSurfaceVariant,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }

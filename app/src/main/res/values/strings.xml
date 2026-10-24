@@ -69,9 +69,9 @@
     <string name="save_parking_done">Listo</string>
 
     <string name="detail_title">Tu vehículo</string>
-    <string name="detail_time_just_now">Estacionado hace un momento</string>
-    <string name="detail_time_minutes">Estacionado hace %1$d min</string>
-    <string name="detail_time_hours_minutes">Estacionado hace %1$d h %2$d min</string>
+    <string name="detail_time_just_now">Hace un momento</string>
+    <string name="detail_time_minutes">Hace %1$d min</string>
+    <string name="detail_time_hours_minutes">Hace %1$d h %2$d min</string>
     <string name="detail_edit">Editar ubicación</string>
     <string name="detail_delete">Eliminar ubicación</string>
     <string name="delete_confirm_title">¿Eliminar ubicación?</string>
@@ -80,8 +80,26 @@
     <string name="delete_confirm_delete">Eliminar</string>
     <string name="detail_open_map">Ver en mapa</string>
     <string name="detail_share">Compartir ubicación</string>
+    <string name="detail_share_copied">Ubicación copiada al portapapeles</string>
     <string name="share_location_title">Mi vehículo en ParkWatch:</string>
     <string name="save_parking_gps_captured">Ubicación GPS guardada</string>
+
+    <!-- Compass / Offline Guidance -->
+    <string name="compass_title">Brújula</string>
+    <string name="compass_guide_me">Guiarme al vehículo</string>
+    <string name="compass_heading_to">Rumbo a tu %1$s</string>
+    <string name="compass_waiting_gps">Buscando señal GPS…</string>
+    <string name="compass_arrived">¡Llegaste a tu vehículo!</string>
+    <string name="compass_distance_meters">%1$d m</string>
+    <string name="compass_distance_km">%1$.1f km</string>
+    <string name="compass_dir_n">Norte</string>
+    <string name="compass_dir_ne">Noreste</string>
+    <string name="compass_dir_e">Este</string>
+    <string name="compass_dir_se">Sureste</string>
+    <string name="compass_dir_s">Sur</string>
+    <string name="compass_dir_sw">Suroeste</string>
+    <string name="compass_dir_w">Oeste</string>
+    <string name="compass_dir_nw">Noroeste</string>
 
     <!-- Complication -->
     <string name="complication_name">ParkWatch</string>

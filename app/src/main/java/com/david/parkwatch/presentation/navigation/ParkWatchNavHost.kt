@@ -22,6 +22,7 @@ import com.david.parkwatch.data.timer.ParkingTimerManager
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.parser.ParsedParkingInfo
 import com.david.parkwatch.domain.parser.VoiceParkingParser
+import com.david.parkwatch.presentation.compass.CompassScreen
 import com.david.parkwatch.presentation.complication.ParkWatchComplicationManager
 import com.david.parkwatch.presentation.detail.ParkingDetailScreen
 import com.david.parkwatch.presentation.home.HomeScreen
@@ -37,6 +38,7 @@ private const val DetailRoute = "detail"
 private const val EditRoute = "edit"
 private const val SettingsRoute = "settings"
 private const val TimerRoute = "timer"
+private const val CompassRoute = "compass"
 
 @Composable
 fun ParkWatchNavHost(
@@ -162,6 +164,7 @@ fun ParkWatchNavHost(
                 ParkingDetailScreen(
                     location = location,
                     onEditClick = { navController.navigate(EditRoute) },
+                    onCompassClick = { navController.navigate(CompassRoute) },
                     onSetTimerClick = { navController.navigate(TimerRoute) },
                     onDeleteConfirmed = {
                         ParkingTimerManager.cancelTimer(context)
@@ -177,6 +180,21 @@ fun ParkWatchNavHost(
                 )
             } else {
                 navController.popBackStack(HomeRoute, inclusive = false)
+            }
+        }
+        composable(CompassRoute) {
+            val location = savedLocation.value
+            if (location != null && location.latitude != null && location.longitude != null) {
+                CompassScreen(
+                    targetLatitude = location.latitude,
+                    targetLongitude = location.longitude,
+                    vehicleType = location.vehicleType,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                )
+            } else {
+                navController.popBackStack()
             }
         }
         composable(TimerRoute) {

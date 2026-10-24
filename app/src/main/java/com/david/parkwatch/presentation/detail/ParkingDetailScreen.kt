@@ -1,8 +1,12 @@
 package com.david.parkwatch.presentation.detail
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +37,7 @@ import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.presentation.component.ParkDestructiveButton
 import com.david.parkwatch.presentation.component.ParkLocationCard
+import com.david.parkwatch.presentation.component.ParkPrimaryButton
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.theme.parkColors
@@ -46,6 +51,7 @@ fun ParkingDetailScreen(
     location: ParkingLocation,
     modifier: Modifier = Modifier,
     onEditClick: () -> Unit,
+    onCompassClick: () -> Unit = {},
     onSetTimerClick: () -> Unit = {},
     onDeleteConfirmed: () -> Unit,
     onNavigateBack: () -> Unit,
@@ -76,10 +82,10 @@ fun ParkingDetailScreen(
                 .padding(contentPadding)
                 .parkRotaryScroll(listState),
             contentPadding = PaddingValues(
-                top = spacing.SpaceMd,
-                bottom = spacing.SpaceXl,
-                start = spacing.SpaceMd,
-                end = spacing.SpaceMd,
+                top = 28.dp,
+                bottom = 48.dp,
+                start = 14.dp,
+                end = 14.dp,
             ),
             verticalArrangement = Arrangement.spacedBy(spacing.SpaceXs),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -110,6 +116,12 @@ fun ParkingDetailScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.secondary,
                             textAlign = TextAlign.Center,
+                        )
+                    }
+                    item {
+                        ParkPrimaryButton(
+                            onClick = onCompassClick,
+                            label = stringResource(R.string.compass_guide_me),
                         )
                     }
                     item {
@@ -211,14 +223,22 @@ fun ParkingDetailScreen(
                                     append("\nhttps://maps.google.com/?q=${location.latitude},${location.longitude}")
                                 }
                             }
-                            val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, shareText)
-                            }
-                            val chooser = Intent.createChooser(sendIntent, context.getString(R.string.detail_share)).apply {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            }
+
+                            // 1. Guaranteed action on Wear OS: copy to clipboard and notify with Toast
+                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                            val clip = ClipData.newPlainText("ParkWatch", shareText)
+                            clipboard?.setPrimaryClip(clip)
+                            Toast.makeText(context, context.getString(R.string.detail_share_copied), Toast.LENGTH_SHORT).show()
+
+                            // 2. Also try system chooser in case messaging apps (e.g. WhatsApp) are installed
                             try {
+                                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, shareText)
+                                }
+                                val chooser = Intent.createChooser(sendIntent, context.getString(R.string.detail_share)).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
                                 context.startActivity(chooser)
                             } catch (_: ActivityNotFoundException) {
                             }

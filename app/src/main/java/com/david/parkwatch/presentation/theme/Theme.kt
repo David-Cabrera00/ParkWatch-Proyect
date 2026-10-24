@@ -94,18 +94,18 @@ private val DarkPalette = ParkPalette(
 )
 
 private val LightPalette = ParkPalette(
-    background = Color(0xFFF6F8F6),
-    surface = Color(0xFFFFFFFF),
-    surfaceHigh = Color(0xFFE6EBE7),
-    primary = Color(0xFF1D6B38),
+    background = Color(0xFFE2E6EA),
+    surface = Color(0xFFEEF2F5),
+    surfaceHigh = Color(0xFFD2D8DF),
+    primary = Color(0xFF166534),
     onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFB7F5C5),
-    onPrimaryContainer = Color(0xFF153D20),
-    secondary = Color(0xFF226A9E),
+    primaryContainer = Color(0xFFC0ECCB),
+    onPrimaryContainer = Color(0xFF0F3B1F),
+    secondary = Color(0xFF1E5B84),
     onSecondary = Color(0xFFFFFFFF),
-    textPrimary = Color(0xFF172019),
-    textSecondary = Color(0xFF59625B),
-    outline = Color(0xFFA9B3AA),
+    textPrimary = Color(0xFF111827),
+    textSecondary = Color(0xFF4B5563),
+    outline = Color(0xFF9AA2AC),
     error = Color(0xFFBA1A1A),
 )
 
