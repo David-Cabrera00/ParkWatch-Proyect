@@ -3,6 +3,8 @@ package com.david.parkwatch.data.repository
 import android.content.Context
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.model.VehicleType
+import org.json.JSONArray
+import org.json.JSONObject
 
 class ParkingRepository(context: Context) {
     private val prefs = context.getSharedPreferences("parkwatch_prefs", Context.MODE_PRIVATE)
@@ -66,10 +68,84 @@ class ParkingRepository(context: Context) {
             .putLong("createdAt", location.createdAt)
             .putLong("updatedAt", location.updatedAt)
             .apply()
+
+        addToHistory(location)
     }
 
     fun clearParkingLocation() {
-        prefs.edit().clear().apply()
+        prefs.edit()
+            .remove("id")
+            .remove("floor")
+            .remove("zone")
+            .remove("row")
+            .remove("spot")
+            .remove("latitude")
+            .remove("longitude")
+            .remove("parkedAt")
+            .remove("expiresAt")
+            .remove("vehicleType")
+            .remove("createdAt")
+            .remove("updatedAt")
+            .apply()
+    }
+
+    fun getParkingHistory(): List<ParkingLocation> {
+        val raw = prefs.getString("parking_history", null) ?: return emptyList()
+        return try {
+            val array = JSONArray(raw)
+            val list = mutableListOf<ParkingLocation>()
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                list.add(
+                    ParkingLocation(
+                        id = obj.getString("id"),
+                        floor = obj.getString("floor"),
+                        zone = obj.getString("zone"),
+                        row = obj.getString("row"),
+                        spot = if (obj.has("spot") && !obj.isNull("spot")) obj.getString("spot") else null,
+                        latitude = if (obj.has("latitude") && !obj.isNull("latitude")) obj.getDouble("latitude") else null,
+                        longitude = if (obj.has("longitude") && !obj.isNull("longitude")) obj.getDouble("longitude") else null,
+                        parkedAt = obj.optLong("parkedAt", 0L),
+                        expiresAt = if (obj.has("expiresAt") && !obj.isNull("expiresAt")) obj.getLong("expiresAt") else null,
+                        vehicleType = VehicleType.fromString(obj.optString("vehicleType", "CAR")),
+                        createdAt = obj.optLong("createdAt", 0L),
+                        updatedAt = obj.optLong("updatedAt", 0L),
+                    )
+                )
+            }
+            list
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    fun clearParkingHistory() {
+        prefs.edit().remove("parking_history").apply()
+    }
+
+    private fun addToHistory(location: ParkingLocation) {
+        val history = getParkingHistory().filter { it.id != location.id }.toMutableList()
+        history.add(0, location)
+        val trimmed = history.take(10)
+        val array = JSONArray()
+        for (item in trimmed) {
+            val obj = JSONObject().apply {
+                put("id", item.id)
+                put("floor", item.floor)
+                put("zone", item.zone)
+                put("row", item.row)
+                put("spot", item.spot)
+                put("latitude", item.latitude)
+                put("longitude", item.longitude)
+                put("parkedAt", item.parkedAt)
+                put("expiresAt", item.expiresAt)
+                put("vehicleType", item.vehicleType.name)
+                put("createdAt", item.createdAt)
+                put("updatedAt", item.updatedAt)
+            }
+            array.put(obj)
+        }
+        prefs.edit().putString("parking_history", array.toString()).apply()
     }
 }
 
