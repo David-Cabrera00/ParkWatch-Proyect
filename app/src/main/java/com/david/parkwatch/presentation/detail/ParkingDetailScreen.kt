@@ -8,10 +8,12 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -173,25 +177,47 @@ fun ParkingDetailScreen(
                             TimeFormatter.formatExpireTime(location.expiresAt)
                         }
 
+                        val totalDuration = (location.expiresAt - location.parkedAt).coerceAtLeast(1L)
+                        val timerProgress = ((location.expiresAt - now).toFloat() / totalDuration).coerceIn(0f, 1f)
+                        val progressColor = if (isExpired || timerProgress <= 0.2f) colors.error else colors.primary
+
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(if (isExpired) colors.errorContainer else colors.surfaceContainer)
+                                .background(if (isExpired) colors.errorContainer.copy(alpha = 0.35f) else colors.surfaceContainer)
                                 .padding(spacing.SpaceMd),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(spacing.SpaceXs),
                         ) {
-                            Text(
-                                text = if (isExpired) stringResource(R.string.timer_expired) else stringResource(R.string.timer_title),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = if (isExpired) colors.error else colors.primary,
-                                textAlign = TextAlign.Center,
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Canvas(modifier = Modifier.size(18.dp)) {
+                                    drawCircle(
+                                        color = colors.surfaceContainerHigh,
+                                        style = Stroke(width = 2.5.dp.toPx()),
+                                    )
+                                    drawArc(
+                                        color = progressColor,
+                                        startAngle = -90f,
+                                        sweepAngle = 360f * timerProgress,
+                                        useCenter = false,
+                                        style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round),
+                                    )
+                                }
+                                Text(
+                                    text = if (isExpired) stringResource(R.string.timer_expired) else stringResource(R.string.timer_title),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = progressColor,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
                             Text(
                                 text = timerLabel,
                                 style = MaterialTheme.typography.titleSmall,
-                                color = if (isExpired) colors.onErrorContainer else colors.onSurface,
+                                color = if (isExpired) colors.error else colors.onSurface,
                                 textAlign = TextAlign.Center,
                             )
                             Text(
