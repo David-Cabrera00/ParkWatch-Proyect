@@ -118,6 +118,19 @@ fun MotorcycleLocationCardPreview() {
 
 @WearPreviewDevices
 @Composable
+fun CompassPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        com.david.parkwatch.presentation.compass.CompassScreen(
+            targetLatitude = 40.416775,
+            targetLongitude = -3.703790,
+            vehicleType = com.david.parkwatch.domain.model.VehicleType.CAR,
+            onNavigateBack = {},
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
 fun LocationCardWithTimerPreview() {
     ParkWatchTheme(darkTheme = true) {
         ParkLocationCard(
