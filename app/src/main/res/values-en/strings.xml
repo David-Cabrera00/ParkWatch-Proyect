@@ -3,6 +3,11 @@
     <string name="location_zone">Zone</string>
     <string name="location_row">Row</string>
     <string name="location_spot">Spot</string>
+    <string name="vehicle_type_title">Vehicle</string>
+    <string name="vehicle_type_car">Car</string>
+    <string name="vehicle_type_motorcycle">Motorcycle</string>
+    <string name="vehicle_type_bicycle">Bicycle</string>
+    <string name="vehicle_type_scooter">Scooter</string>
     <string name="settings_title">Settings</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_system">System</string>
