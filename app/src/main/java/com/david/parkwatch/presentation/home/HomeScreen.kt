@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,9 +22,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -76,7 +81,7 @@ fun HomeScreen(
                 item {
                     Box(
                         modifier = Modifier
-                            .size(64.dp)
+                            .size(48.dp)
                             .clip(RoundedCornerShape(50))
                             .background(colors.surfaceContainer),
                         contentAlignment = Alignment.Center,
@@ -84,24 +89,10 @@ fun HomeScreen(
                         Icon(
                             painter = painterResource(R.drawable.ic_directions_car),
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(24.dp),
                             tint = colors.primary,
                         )
                     }
-                }
-                item {
-                    Spacer(modifier = Modifier.size(spacing.SpaceSm))
-                }
-                item {
-                    Text(
-                        text = stringResource(R.string.home_brand),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
                 }
                 item {
                     Text(
@@ -109,19 +100,11 @@ fun HomeScreen(
                         style = MaterialTheme.typography.titleMedium,
                         color = colors.onBackground,
                         textAlign = TextAlign.Center,
-                        maxLines = 2,
+                        maxLines = 1,
                     )
                 }
                 item {
-                    Text(
-                        text = stringResource(R.string.home_empty_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.size(spacing.SpaceMd))
+                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
                 }
                 item {
                     ParkPrimaryButton(
@@ -130,28 +113,120 @@ fun HomeScreen(
                     )
                 }
                 item {
-                    ParkSecondaryButton(
-                        onClick = onQuickSaveClick,
-                        label = stringResource(R.string.home_quick_save),
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Button(
+                            onClick = onQuickSaveClick,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(40.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = colors.surfaceContainerHigh,
+                                contentColor = colors.onSurface,
+                            ),
+                            label = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_location_on),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = colors.primary,
+                                    )
+                                    Spacer(modifier = Modifier.size(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.home_quick_save_chip),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        maxLines = 1,
+                                    )
+                                }
+                            },
+                        )
+                        Button(
+                            onClick = onVoiceClick,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(40.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = colors.surfaceContainerHigh,
+                                contentColor = colors.onSurface,
+                            ),
+                            label = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_mic),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = colors.primary,
+                                    )
+                                    Spacer(modifier = Modifier.size(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.home_voice_chip),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        maxLines = 1,
+                                    )
+                                }
+                            },
+                        )
+                    }
                 }
                 item {
-                    ParkSecondaryButton(
-                        onClick = onVoiceClick,
-                        label = stringResource(R.string.home_voice_input),
-                    )
-                }
-                item {
-                    ParkSecondaryButton(
-                        onClick = onHistoryClick,
-                        label = stringResource(R.string.history_title),
-                    )
-                }
-                item {
-                    ParkSecondaryButton(
-                        onClick = onSettingsClick,
-                        label = stringResource(R.string.settings_open),
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Button(
+                            onClick = onHistoryClick,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(38.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = colors.surfaceContainer,
+                                contentColor = colors.onSurfaceVariant,
+                            ),
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.history_title),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            },
+                        )
+                        Button(
+                            onClick = onSettingsClick,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(38.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = colors.surfaceContainer,
+                                contentColor = colors.onSurfaceVariant,
+                            ),
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.settings_open),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            },
+                        )
+                    }
                 }
             } else {
                 item {
