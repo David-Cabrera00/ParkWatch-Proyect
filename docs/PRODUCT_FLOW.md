@@ -2,208 +2,134 @@
 
 ## Main Goal
 
-Allow the user to save and retrieve the location of their parked vehicle quickly from a Wear OS smartwatch.
+Allow the user to save and retrieve the location of their parked vehicle quickly and effortlessly from a Wear OS smartwatch.
 
 ---
 
 ## Main User Flow
 
-### No saved parking location
+### 1. No saved parking location (Empty State)
 
-Home offers 3 options to save:
-1. **Manual Wizard**: Home → Save Vehicle → Floor → Zone → Row → Spot (optional) → Review → Save
-2. **Quick GPS Save (1-Tap)**: Home → Quick save (GPS) → Instantly captures coordinates & timestamp → Detail
-3. **Voice Input**: Home → Voice input → Spoken text parsed → Review → Save
-
----
-
-### Saved parking location
-
-Home
-→ View Vehicle
-→ Parking Detail
-
-Parking Detail allows:
-
-- View floor, zone, row, spot
-- View parking elapsed time
-- View / set / edit / remove parking timer (parquímetro)
-- View on map (if GPS coordinates are available)
-- Share parking location (SMS, WhatsApp, companion phone via Android Share Sheet)
-- Edit location
-- Delete location (with explicit confirmation)
+The Home screen presents a clean, circular-optimized empty view with multiple registration options:
+1. **Primary Button**: "Guardar vehículo" → Launches the Step-by-Step Wizard (Floor → Zone → Row → Spot → Review).
+2. **2-Column Quick Action Row**:
+   - `[ 📍 GPS rápido ]`: 1-tap instant save using current GPS coordinates & timestamp.
+   - `[ 🎙️ Por voz ]`: Direct voice dictation parsed by `VoiceParkingParser`.
+3. **2-Column Utility Row**:
+   - `[ Historial ]`: View previous parking sessions.
+   - `[ Ajustes ]`: Configure theme (System, Light, Dark) and language (System, Spanish, English).
 
 ---
 
-## Quick GPS Save Flow (1-Tap)
+### 2. Saved parking location (Active State)
 
-Home (Empty state)
-→ Tap "Quick save (GPS)"
-→ If permission needed, requests location permission
-→ Captures current GPS coordinates & current timestamp
-→ Saves location immediately with floor="GPS"
-→ Opens Parking Detail (user can tap "Edit" later to add floor/zone/spot)
+The Home screen displays an elevated card showing:
+- Vehicle type icon & name (Car, Motorcycle, Bicycle, Electric Scooter).
+- Floor, Zone, Row, and Spot.
+- Elapsed parking time ("Hace 25 min").
+- Parquímetro countdown badge (if active timer is set).
 
----
-
-## Share Location Flow
-
-Parking Detail
-→ Tap "Share location"
-→ Opens system Share Chooser (`Intent.ACTION_SEND`)
-→ Formats location details + Google Maps link:
-  > "Mi vehículo en ParkWatch:
-  > Piso: P2
-  > Zona: B
-  > Fila: 14
-  > Puesto: 27
-  > https://maps.google.com/?q=..."
+**Actions from Home:**
+1. **Primary 1-Tap Action**:
+   - If GPS coordinates are saved: **"🧭 Guiarme al vehículo"** (opens CompassScreen immediately).
+   - If manual-only: **"Ver detalles"** (opens ParkingDetailScreen).
+2. **Direct Card Tap**: Tapping `ParkLocationCard` directly opens `ParkingDetailScreen`.
+3. **Secondary Action**: "Ver detalles" sits directly below the Compass button.
 
 ---
 
-## Edit Flow
+### 3. Offline Compass & Radar Guidance Flow
 
-Parking Detail
-→ Edit
-→ Update parking information
-→ Save
-→ Confirmation
-→ Parking Detail
+```
+Home (Vehicle Saved with GPS)
+→ Tap "🧭 Guiarme al vehículo"
+→ CompassScreen
+```
 
----
+* **Live Compass Dial**:
+  - Uses `CompassSensorManager` (Rotation Vector / Accelerometer + Magnetometer fusion).
+  - Dynamic analog needle pointing directly to target coordinates.
+  - Heading and distance readout ("A 45 m").
+  - Tapping the center vehicle badge allows ending guidance anytime.
 
-## Delete Flow
-
-Parking Detail
-→ Delete
-→ Delete Confirmation
-
-If confirmed:
-
-Delete saved location & cancel any active timer
-→ Home empty state
-
-If cancelled:
-
-Return to Parking Detail
+* **Arrival Screen (< 10 meters)**:
+  - When the user reaches within 10 meters of their vehicle, the dial transitions smoothly to a dedicated **Arrival Screen**:
+    - Centered green vehicle badge (52dp).
+    - "¡Llegaste a tu [Vehículo]!"
+    - Primary button: **"Liberar lugar"**.
+  - Tapping "Liberar lugar" triggers a confirmation dialog:
+    - *"¿Finalizar parqueo? Se guardará en tu historial"*.
+    - Confirmed: Archiva la ubicación en el historial persistente, cancela alarmas de parquímetro activas, actualiza Tiles y Complicaciones, muestra Toast y regresa al Home.
 
 ---
 
-## Parking Timer Flow (Parquímetro)
+### 4. Step-by-Step Save Wizard & Quick Shortcuts
 
-Parking Detail
-→ Set Time Limit
-→ Select duration (15m, 30m, 45m, 1h, 1.5h, 2h, 3h)
-→ Save timer
-→ Return to Parking Detail (displays active countdown & limit time)
-
-When timer is active:
-- 15 minutes before limit: High-priority Wear OS warning notification + vibration
-- At expiration: High-priority Wear OS expiration notification + vibration
-- Home screen and Detail screen show remaining time badge
-
-Options from Parking Detail:
-- Modify time limit
-- Remove time limit
+1. **Step 1 - Floor**: P1, P2, P3, B1, B2 (Instant auto-advance with tactile haptic tick).
+2. **Step 2 - Zone**: A, B, C, D (Instant auto-advance).
+   - Shortcut available: *"Listo / Guardar ya"* to jump directly to Review.
+3. **Step 3 - Row**: Options 1–15 or **"Sin fila"** (Instant auto-advance).
+   - Shortcut available: *"Listo / Guardar ya"*.
+4. **Step 4 - Spot**: Options 1–30 or "Sin puesto" (Instant auto-advance to Review).
+5. **Step 5 - Review & Vehicle Selection**:
+   - Preview card with vehicle badge.
+   - Vehicle selector: Auto, Moto, Bici, Scooter.
+   - Primary button: "Guardar ubicación".
 
 ---
 
-## Voice Flow
+### 5. 1-Tap Quick Edit Flow
 
-Home or Save Parking
-→ Voice Input
-→ User speaks parking information
-→ Parsed parking information
-→ Review
-→ Save
+```
+Parking Detail → Tap "Editar ubicación" → SaveParkingScreen (Review Step)
+```
 
-Example:
-
-"Piso 2, zona B, fila 14, puesto 27"
-
-Result:
-
-Floor: 2
-Zone: B
-Row: 14
-Spot: 27
+* Opens directly in `SaveStep.REVIEW` (does not restart wizard from Floor 1).
+* **Direct Field Chips (2x2 Grid)**:
+  - `[ Piso: P1 ]` `[ Zona: A ]`
+  - `[ Fila: 2 ]` `[ Puesto: 14 ]`
+* Tapping any chip jumps directly to that specific picker. Once an option is chosen, it automatically returns to the Review screen.
+* **Back Navigation**: Pressing back returns to Review without losing data, or pops back to Detail if already on Review.
+* **Timer Preservation**: Editing location details preserves active `expiresAt` parking timers.
 
 ---
 
-## Location Flow
+### 6. Parking Timer Flow (Parquímetro)
 
-GPS location is optional.
+```
+Parking Detail → Tap "Límite de tiempo" → SetTimerScreen
+```
 
-Save Parking
-→ Request Location Permission
-→ Capture current location
-
-If permission is denied:
-
-Continue without GPS.
-
-Manual parking information must always remain available.
-
----
-
-## Home States
-
-### Empty
-
-Display:
-
-Where did you park?
-
-Primary action:
-
-Save vehicle (Wizard)
-
-Secondary actions:
-
-- Quick save (GPS)
-- Voice input
-- Settings
+* **Compact 2-Column Preset Grid**:
+  - `[ 15 min ]` `[ 30 min ]`
+  - `[ 45 min ]` `[ 1 hora ]`
+  - `[ 1 h 30 ]` `[ 2 horas ]`
+  - `[ 3 horas ]` `[ 4 horas ]`
+* **Zero-scroll UI**: Fits cleanly within 384x384 circular watch displays.
+* **Proactive Notifications**:
+  - Warning alert 15 minutes before expiration.
+  - Final alarm when time expires.
+* **Remove Timer**: Prominent button to cancel timer anytime.
 
 ---
 
-### Vehicle Saved
+### 7. Hardware Rotary Scroll & Haptics
 
-Display:
-
-Floor
-
-Zone
-
-Row
-
-Parking spot if available
-
-Time since parking
-
-Active timer / limit countdown (if set)
-
-Primary action:
-
-View vehicle
-
-Secondary action:
-
-Settings
+* All vertical lists (`ScalingLazyColumn`) implement `.parkRotaryScroll(listState)`.
+* Attaches physical focus (`.focusRequester().focusable()`) to capture rotating bezel and crown hardware inputs.
+* Emits smooth inertia scrolling and tactile haptic ticks on snap intervals.
 
 ---
 
-## Core Requirement
+### 8. Native Wear OS Integration
 
-ParkWatch must work without an Internet connection.
+* **Tile (ParkWatchTileService)**: Displays vehicle status, parking zone/spot, elapsed time, and 1-tap launcher from the watch face carousel.
+* **Complication (ParkWatchComplicationService)**: Circular and short-text complications to display parking status directly on custom watch faces.
+* **Share Location**: Uses Android system share sheet (`Intent.ACTION_SEND`) to share spot coordinates and Google Maps link via messaging apps or companion phone.
 
-The following features must work offline:
+---
 
-- Save parking location (manual, quick GPS, or voice)
-- View parking location
-- Edit parking location
-- Delete parking location
-- View parking time
-- Set & receive parking timer alerts
-- Share parking location text
+### 9. Core Offline Guarantee
 
-GPS and voice features enhance the experience but must not block manual usage.
+ParkWatch is completely functional without internet connection.
+GPS and voice recognition are optional enhancements that degrade gracefully to manual entry without blocking the user.
