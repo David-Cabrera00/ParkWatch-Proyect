@@ -42,6 +42,7 @@ import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
+import com.david.parkwatch.presentation.util.TimeFormatter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -106,7 +107,7 @@ fun ParkingDetailScreen(
                         row = location.row,
                         spot = location.spot,
                         vehicleType = location.vehicleType,
-                        elapsedTime = formatElapsedTime(location.parkedAt),
+                        elapsedTime = TimeFormatter.formatElapsedTime(location.parkedAt, context),
                     )
                 }
                 if (location.latitude != null && location.longitude != null) {
@@ -127,13 +128,25 @@ fun ParkingDetailScreen(
                     item {
                         ParkSecondaryButton(
                             onClick = {
-                                val uri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehicle)")
-                                val mapIntent = Intent(Intent.ACTION_VIEW, uri).apply {
+                                val geoUri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehiculo)")
+                                val mapIntent = Intent(Intent.ACTION_VIEW, geoUri).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                val webUri = Uri.parse("https://maps.google.com/?q=${location.latitude},${location.longitude}")
+                                val webIntent = Intent(Intent.ACTION_VIEW, webUri).apply {
                                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 }
                                 try {
                                     context.startActivity(mapIntent)
-                                } catch (_: ActivityNotFoundException) {
+                                } catch (_: Exception) {
+                                    try {
+                                        context.startActivity(webIntent)
+                                    } catch (_: Exception) {
+                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                                        val clip = ClipData.newPlainText("Google Maps", webUri.toString())
+                                        clipboard?.setPrimaryClip(clip)
+                                        Toast.makeText(context, context.getString(R.string.detail_map_not_found), Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             },
                             label = stringResource(R.string.detail_open_map),
@@ -156,8 +169,9 @@ fun ParkingDetailScreen(
                                 stringResource(R.string.timer_remaining_hours_minutes, remMin / 60, remMin % 60)
                             }
                         }
-                        val timeFormat = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
-                        val expireTimeStr = timeFormat.format(Date(location.expiresAt))
+                        val expireTimeStr = remember(location.expiresAt) {
+                            TimeFormatter.formatExpireTime(location.expiresAt)
+                        }
 
                         Column(
                             modifier = Modifier
@@ -287,20 +301,5 @@ fun ParkingDetailScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun formatElapsedTime(parkedAt: Long): String {
-    val now = System.currentTimeMillis()
-    val elapsedMillis = (now - parkedAt).coerceAtLeast(0L)
-    val elapsedMinutes = elapsedMillis / (1000 * 60)
-    val hours = elapsedMinutes / 60
-    val minutes = elapsedMinutes % 60
-
-    return when {
-        elapsedMinutes < 1 -> stringResource(R.string.detail_time_just_now)
-        hours < 1 -> stringResource(R.string.detail_time_minutes, elapsedMinutes)
-        else -> stringResource(R.string.detail_time_hours_minutes, hours, minutes)
     }
 }
