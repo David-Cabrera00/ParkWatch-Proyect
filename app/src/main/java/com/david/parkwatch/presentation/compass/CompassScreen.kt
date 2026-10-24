@@ -9,6 +9,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,8 @@ import com.david.parkwatch.R
 import com.david.parkwatch.data.location.LocationHelper
 import com.david.parkwatch.data.sensor.CompassSensorManager
 import com.david.parkwatch.domain.model.VehicleType
+import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.model.iconRes
 import com.david.parkwatch.presentation.model.labelRes
 import com.david.parkwatch.presentation.theme.parkColors
@@ -55,7 +58,7 @@ import com.david.parkwatch.presentation.theme.parkSpacing
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val ARRIVAL_THRESHOLD_METERS = 5f
+private const val ARRIVAL_THRESHOLD_METERS = 10f
 
 @Composable
 fun CompassScreen(
@@ -64,6 +67,7 @@ fun CompassScreen(
     vehicleType: VehicleType,
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit = {},
+    onClearLocation: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val colors = parkColors()
@@ -160,8 +164,14 @@ fun CompassScreen(
         }
     }
 
+    var isConfirmingFinish by remember { mutableStateOf(false) }
+
     BackHandler {
-        onNavigateBack()
+        if (isConfirmingFinish) {
+            isConfirmingFinish = false
+        } else {
+            onNavigateBack()
+        }
     }
 
     ScreenScaffold(
@@ -169,103 +179,161 @@ fun CompassScreen(
             .fillMaxSize()
             .background(colors.background),
     ) { contentPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Dial Canvas: Outer circle, cardinal ticks and needle
-            CompassDial(
-                needleAngle = animatedAngle,
-                isArrived = isArrived,
-                primaryColor = colors.primary,
-                secondaryColor = colors.secondary,
-                surfaceColor = colors.surfaceContainer,
-                outlineColor = colors.surfaceContainerHigh,
-                modifier = Modifier.fillMaxSize(),
-            )
-
-            // Center Vehicle Hub
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(colors.surfaceContainerHigh),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(vehicleType.iconRes),
-                    contentDescription = stringResource(vehicleType.labelRes),
-                    modifier = Modifier.size(20.dp),
-                    tint = if (isArrived) colors.primary else colors.onSurface,
-                )
-            }
-
-            // Top Header & Bottom Distance Labels
+        if (isConfirmingFinish) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = spacing.SpaceLg, vertical = spacing.SpaceSm),
+                    .padding(contentPadding)
+                    .padding(horizontal = 14.dp, vertical = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.Center,
             ) {
-                // Header
                 Text(
-                    text = stringResource(R.string.compass_heading_to, stringResource(vehicleType.labelRes)),
-                    style = MaterialTheme.typography.labelSmall,
+                    text = stringResource(R.string.compass_finish_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.primary,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                Text(
+                    text = stringResource(R.string.compass_finish_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
                     color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    maxLines = 1,
+                )
+                Spacer(modifier = Modifier.size(spacing.SpaceMd))
+                ParkPrimaryButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onClearLocation()
+                    },
+                    label = stringResource(R.string.compass_finish_confirm),
+                )
+                Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                ParkSecondaryButton(
+                    onClick = { isConfirmingFinish = false },
+                    label = stringResource(R.string.delete_confirm_cancel),
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+                contentAlignment = Alignment.Center,
+            ) {
+                // Dial Canvas: Outer circle, cardinal ticks and needle
+                CompassDial(
+                    needleAngle = animatedAngle,
+                    isArrived = isArrived,
+                    primaryColor = colors.primary,
+                    secondaryColor = colors.secondary,
+                    surfaceColor = colors.surfaceContainer,
+                    outlineColor = colors.surfaceContainerHigh,
+                    modifier = Modifier.fillMaxSize(),
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Bottom Status
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    when {
-                        isArrived -> {
-                            Text(
-                                text = stringResource(R.string.compass_arrived),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = colors.primary,
-                                textAlign = TextAlign.Center,
-                            )
+                // Center Vehicle Hub (clickable to finish guidance anytime)
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            isConfirmingFinish = true
                         }
-                        distanceMeters != null -> {
-                            val dist = distanceMeters!!
-                            val formattedDist = if (dist < 1000f) {
-                                stringResource(R.string.compass_distance_meters, dist.toInt())
-                            } else {
-                                stringResource(R.string.compass_distance_km, dist / 1000f)
-                            }
-                            Text(
-                                text = formattedDist,
-                                style = MaterialTheme.typography.titleLarge,
-                                color = colors.primary,
-                                textAlign = TextAlign.Center,
-                            )
-                            val cardinalKey = targetBearing?.let { LocationHelper.getCardinalDirectionKey(it) }
-                            val cardinalString = cardinalKey?.let { getCardinalString(it) }.orEmpty()
-                            if (cardinalString.isNotBlank()) {
+                        .background(colors.surfaceContainerHigh),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(vehicleType.iconRes),
+                        contentDescription = stringResource(vehicleType.labelRes),
+                        modifier = Modifier.size(20.dp),
+                        tint = if (isArrived) colors.primary else colors.onSurface,
+                    )
+                }
+
+                // Top Header & Bottom Distance Labels
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 14.dp, vertical = 18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    // Header
+                    Text(
+                        text = if (isArrived) {
+                            stringResource(R.string.compass_arrived_destination, stringResource(vehicleType.labelRes))
+                        } else {
+                            stringResource(R.string.compass_heading_to, stringResource(vehicleType.labelRes))
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Bottom Status
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        when {
+                            isArrived -> {
                                 Text(
-                                    text = cardinalString,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = colors.onSurfaceVariant,
+                                    text = stringResource(R.string.compass_arrived_short),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = colors.primary,
                                     textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                )
+                                Spacer(modifier = Modifier.size(2.dp))
+                                ParkPrimaryButton(
+                                    onClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        isConfirmingFinish = true
+                                    },
+                                    label = stringResource(R.string.compass_free_spot),
                                 )
                             }
-                        }
-                        else -> {
-                            Text(
-                                text = stringResource(R.string.compass_waiting_gps),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = colors.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                            )
+                            distanceMeters != null -> {
+                                val dist = distanceMeters!!
+                                val formattedDist = if (dist < 1000f) {
+                                    stringResource(R.string.compass_distance_meters, dist.toInt())
+                                } else {
+                                    stringResource(R.string.compass_distance_km, dist / 1000f)
+                                }
+                                Text(
+                                    text = formattedDist,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = colors.primary,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                )
+                                val cardinalKey = targetBearing?.let { LocationHelper.getCardinalDirectionKey(it) }
+                                val cardinalString = cardinalKey?.let { getCardinalString(it) }.orEmpty()
+                                if (cardinalString.isNotBlank()) {
+                                    Text(
+                                        text = cardinalString,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = colors.onSurfaceVariant,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1,
+                                    )
+                                }
+                            }
+                            else -> {
+                                Text(
+                                    text = stringResource(R.string.compass_waiting_gps),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = colors.onSurfaceVariant,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                )
+                            }
                         }
                     }
                 }
@@ -290,7 +358,7 @@ private fun CompassDial(
             .rotate(needleAngle),
     ) {
         val center = Offset(size.width / 2f, size.height / 2f)
-        val radius = (size.minDimension / 2f) - 16.dp.toPx()
+        val radius = (size.minDimension / 2f) - 36.dp.toPx()
 
         // Outer Ring
         drawCircle(
