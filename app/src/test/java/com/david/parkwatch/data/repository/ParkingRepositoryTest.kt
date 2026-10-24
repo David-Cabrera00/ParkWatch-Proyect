@@ -2,6 +2,7 @@ package com.david.parkwatch.data.repository
 
 import android.content.Context
 import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.domain.model.VehicleType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -54,6 +55,7 @@ class ParkingRepositoryTest {
         assertEquals("27", saved?.spot)
         assertEquals(40.416775, saved?.latitude ?: 0.0, COORDINATE_DELTA)
         assertEquals(-3.703790, saved?.longitude ?: 0.0, COORDINATE_DELTA)
+        assertEquals(VehicleType.CAR, saved?.vehicleType)
         assertEquals(location.parkedAt, saved?.parkedAt)
         assertEquals(location.createdAt, saved?.createdAt)
         assertEquals(location.updatedAt, saved?.updatedAt)
@@ -133,6 +135,15 @@ class ParkingRepositoryTest {
         assertNull(updated?.expiresAt)
     }
 
+    @Test
+    fun saveParkingLocation_persistsDifferentVehicleTypes() {
+        VehicleType.entries.forEach { type ->
+            repository.saveParkingLocation(createLocation(vehicleType = type))
+            val saved = repository.getParkingLocation()
+            assertEquals(type, saved?.vehicleType)
+        }
+    }
+
     private fun createLocation(
         id: String = "test-id",
         floor: String = "P1",
@@ -142,6 +153,7 @@ class ParkingRepositoryTest {
         latitude: Double? = null,
         longitude: Double? = null,
         expiresAt: Long? = null,
+        vehicleType: VehicleType = VehicleType.CAR,
     ) = ParkingLocation(
         id = id,
         floor = floor,
@@ -152,6 +164,7 @@ class ParkingRepositoryTest {
         longitude = longitude,
         parkedAt = 1_700_000_000_000L,
         expiresAt = expiresAt,
+        vehicleType = vehicleType,
         createdAt = 1_700_000_000_000L,
         updatedAt = 1_700_000_000_000L,
     )
