@@ -70,6 +70,28 @@ class ParkingDetailScreenTest {
         assertTrue(editClicked)
     }
 
+    @Test
+    fun compass_displayedAndClickableWhenCoordinatesPresent() {
+        var compassClicked = false
+        composeRule.setContent {
+            ParkWatchTheme {
+                ParkingDetailScreen(
+                    location = parkingLocation().copy(latitude = 40.416775, longitude = -3.703790),
+                    onEditClick = {},
+                    onCompassClick = { compassClicked = true },
+                    onDeleteConfirmed = {},
+                    onNavigateBack = {},
+                )
+            }
+        }
+
+        val compassLabel = context.getString(R.string.compass_guide_me)
+        composeRule.onNode(hasScrollAction()).performScrollToNode(hasText(compassLabel))
+        composeRule.onNodeWithText(compassLabel).assertIsDisplayed().performClick()
+
+        assertTrue(compassClicked)
+    }
+
     private fun scrollToAndClick(label: String) {
         composeRule.onNode(hasScrollAction()).performScrollToNode(hasText(label))
         composeRule.onNodeWithText(label).performClick()

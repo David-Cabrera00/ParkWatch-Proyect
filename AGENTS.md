@@ -24,9 +24,10 @@ Android Wear OS app (minSdk 30, targetSdk 37) using Jetpack Compose for Wear OS.
 ```
 app/src/main/java/com/david/parkwatch/
 ├── data/
-│   ├── location/                # LocationHelper (GPS)
+│   ├── location/                # LocationHelper (GPS, distance, bearing)
 │   ├── preferences/             # AppPreferences & AppPreferencesStore
 │   ├── repository/              # ParkingRepository
+│   ├── sensor/                  # CompassSensorManager (Rotation Vector, Accelerometer, Magnetometer)
 │   └── timer/                   # ParkingTimerManager & ParkingTimerReceiver
 ├── domain/
 │   ├── model/                   # ParkingLocation, VehicleType
@@ -38,6 +39,7 @@ app/src/main/java/com/david/parkwatch/
     ├── model/                   # VehicleTypeUi helpers (icons, labels)
     ├── home/                    # HomeScreen
     ├── detail/                  # ParkingDetailScreen
+    ├── compass/                 # CompassScreen (offline radar needle guidance)
     ├── save/                    # SaveParkingScreen
     ├── settings/                # SettingsScreen
     ├── complication/            # Wear OS Complication DataSource & Manager
