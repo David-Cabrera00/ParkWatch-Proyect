@@ -26,6 +26,8 @@
     <string name="home_view_vehicle">View vehicle</string>
     <string name="home_saved_title">Vehicle parked</string>
     <string name="home_voice_input">Voice input</string>
+    <string name="home_quick_save_chip">Quick GPS</string>
+    <string name="home_voice_chip">Voice</string>
     <string name="voice_prompt">Say floor, zone, row and spot</string>
     <string name="save_parking_title">Save location</string>
     <string name="save_parking_floor_prompt">Select the floor</string>
