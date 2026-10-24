@@ -294,6 +294,7 @@ fun ParkWatchNavHost(
             SettingsScreen(
                 preferences = preferences,
                 onThemeSelected = { mode -> onPreferencesChanged(preferences.copy(themeMode = mode)) },
+                onAccentColorSelected = { color -> onPreferencesChanged(preferences.copy(accentColor = color)) },
                 onLanguageSelected = { language -> onPreferencesChanged(preferences.copy(language = language)) },
                 onHistoryClick = { navController.navigate(HistoryRoute) },
             )
