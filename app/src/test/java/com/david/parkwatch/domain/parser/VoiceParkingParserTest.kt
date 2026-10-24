@@ -1,5 +1,6 @@
 package com.david.parkwatch.domain.parser
 
+import com.david.parkwatch.domain.model.VehicleType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -88,5 +89,24 @@ class VoiceParkingParserTest {
         assertEquals("B", result2.zone)
         assertEquals("2", result2.row)
         assertEquals("5", result2.spot)
+    }
+
+    @Test
+    fun parse_vehicleType_detectsVehicleKeywords() {
+        val moto = VoiceParkingParser.parse("Dejé la moto en el piso 1 zona A fila 3")
+        assertEquals(VehicleType.MOTORCYCLE, moto.vehicleType)
+        assertEquals("P1", moto.floor)
+
+        val bici = VoiceParkingParser.parse("Parqueé la bicicleta en piso 2 zona B fila 1")
+        assertEquals(VehicleType.BICYCLE, bici.vehicleType)
+
+        val scooter = VoiceParkingParser.parse("Patineta en sótano 1 zona C fila 2")
+        assertEquals(VehicleType.SCOOTER, scooter.vehicleType)
+
+        val auto = VoiceParkingParser.parse("Carro en nivel 3 sector D hilera 4")
+        assertEquals(VehicleType.CAR, auto.vehicleType)
+
+        val neutral = VoiceParkingParser.parse("Piso 1 zona A fila 2")
+        assertNull(neutral.vehicleType)
     }
 }
