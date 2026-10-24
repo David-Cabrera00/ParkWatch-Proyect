@@ -19,6 +19,7 @@ import androidx.wear.tiles.TileService
 import com.david.parkwatch.R
 import com.david.parkwatch.data.repository.ParkingRepository
 import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.presentation.model.labelRes
 import com.david.parkwatch.presentation.MainActivity
 import com.google.common.util.concurrent.ListenableFuture
 
@@ -79,6 +80,7 @@ class ParkWatchTileService : TileService() {
             .build()
 
         return if (location != null) {
+            val vehicleLabel = context.getString(location.vehicleType.labelRes)
             val mainText = buildString {
                 append("${location.floor} · ${location.zone} · ${location.row}")
                 if (!location.spot.isNullOrBlank()) {
@@ -107,7 +109,7 @@ class ParkWatchTileService : TileService() {
 
             PrimaryLayout.Builder(deviceParams)
                 .setPrimaryLabelTextContent(
-                    Text.Builder(context, context.getString(R.string.home_saved_title))
+                    Text.Builder(context, "${context.getString(R.string.home_saved_title)} ($vehicleLabel)")
                         .setTypography(Typography.TYPOGRAPHY_CAPTION1)
                         .setColor(argb(0xFF90CAF9.toInt()))
                         .build()

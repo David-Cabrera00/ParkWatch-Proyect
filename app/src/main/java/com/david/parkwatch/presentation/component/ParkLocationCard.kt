@@ -17,6 +17,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.wear.compose.material3.Icon
+import com.david.parkwatch.domain.model.VehicleType
+import com.david.parkwatch.presentation.model.iconRes
+import com.david.parkwatch.presentation.model.labelRes
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 
@@ -26,6 +32,7 @@ fun ParkLocationCard(
     zone: String,
     row: String,
     spot: String? = null,
+    vehicleType: VehicleType = VehicleType.CAR,
     elapsedTime: String? = null,
     timerInfo: String? = null,
     isTimerExpired: Boolean = false,
@@ -42,12 +49,38 @@ fun ParkLocationCard(
             .padding(spacing.SpaceMd),
         verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
     ) {
-        Text(
-            text = floor,
-            style = MaterialTheme.typography.numeralLarge,
-            color = colors.primary,
-            maxLines = 1,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = floor,
+                style = MaterialTheme.typography.numeralLarge,
+                color = colors.primary,
+                maxLines = 1,
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(colors.surfaceContainerHigh)
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
+            ) {
+                Icon(
+                    painter = painterResource(vehicleType.iconRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = colors.primary,
+                )
+                Text(
+                    text = stringResource(vehicleType.labelRes),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.onSurface,
+                )
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm),

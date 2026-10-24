@@ -29,12 +29,13 @@ app/src/main/java/com/david/parkwatch/
 │   ├── repository/              # ParkingRepository
 │   └── timer/                   # ParkingTimerManager & ParkingTimerReceiver
 ├── domain/
-│   ├── model/                   # ParkingLocation
+│   ├── model/                   # ParkingLocation, VehicleType
 │   └── parser/                  # VoiceParkingParser
 └── presentation/
     ├── MainActivity.kt          # Entry point, WearApp composable
     ├── PreviewCatalog.kt        # Previews catalog
-    ├── component/               # Reusable ParkWatch components (Buttons, Cards)
+    ├── component/               # Reusable ParkWatch components (Buttons, Cards, VehicleTypeSelector)
+    ├── model/                   # VehicleTypeUi helpers (icons, labels)
     ├── home/                    # HomeScreen
     ├── detail/                  # ParkingDetailScreen
     ├── save/                    # SaveParkingScreen

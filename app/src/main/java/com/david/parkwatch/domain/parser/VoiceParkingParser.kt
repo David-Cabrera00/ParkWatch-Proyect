@@ -1,13 +1,16 @@
 package com.david.parkwatch.domain.parser
 
+import com.david.parkwatch.domain.model.VehicleType
+
 data class ParsedParkingInfo(
     val floor: String? = null,
     val zone: String? = null,
     val row: String? = null,
     val spot: String? = null,
+    val vehicleType: VehicleType? = null,
 ) {
     val hasData: Boolean
-        get() = floor != null || zone != null || row != null || spot != null
+        get() = floor != null || zone != null || row != null || spot != null || vehicleType != null
 
     val isComplete: Boolean
         get() = !floor.isNullOrBlank() && !zone.isNullOrBlank() && !row.isNullOrBlank()
@@ -51,11 +54,21 @@ object VoiceParkingParser {
             spot = normalizeNumber(raw) ?: raw
         }
 
+        // 5. Tipo de Vehículo (opcional)
+        val vehicleType = when {
+            Regex("""\b(moto|motocicleta|motoneta|motorcycle|motorbike)\b""").containsMatchIn(lower) -> VehicleType.MOTORCYCLE
+            Regex("""\b(bici|bicicleta|cicla|bike|bicycle)\b""").containsMatchIn(lower) -> VehicleType.BICYCLE
+            Regex("""\b(scooter|patineta|monopat[ií]n)\b""").containsMatchIn(lower) -> VehicleType.SCOOTER
+            Regex("""\b(auto|carro|coche|veh[ií]culo|camioneta|car|vehicle)\b""").containsMatchIn(lower) -> VehicleType.CAR
+            else -> null
+        }
+
         return ParsedParkingInfo(
             floor = floor,
             zone = zone,
             row = row,
             spot = spot,
+            vehicleType = vehicleType,
         )
     }
 

@@ -42,11 +42,13 @@ import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
 import com.david.parkwatch.data.location.LocationHelper
 import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.domain.model.VehicleType
 import com.david.parkwatch.domain.parser.ParsedParkingInfo
 import com.david.parkwatch.presentation.component.ParkPrimaryButton
 import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.component.ParkLocationCard
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
+import com.david.parkwatch.presentation.component.VehicleTypeSelector
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
 import java.util.UUID
@@ -90,6 +92,9 @@ fun SaveParkingScreen(
     val selectedZone = remember { mutableStateOf<String?>(initialLocation?.zone ?: initialParsed?.zone) }
     val selectedRow = remember { mutableStateOf<String?>(initialLocation?.row ?: initialParsed?.row) }
     val selectedSpot = remember { mutableStateOf<String?>(initialLocation?.spot ?: initialParsed?.spot) }
+    val selectedVehicleType = remember {
+        mutableStateOf(initialLocation?.vehicleType ?: initialParsed?.vehicleType ?: VehicleType.CAR)
+    }
     val haptic = LocalHapticFeedback.current
     val listState = rememberScalingLazyListState()
 
@@ -398,6 +403,7 @@ fun SaveParkingScreen(
                                 zone = selectedZone.value.orEmpty(),
                                 row = selectedRow.value.orEmpty(),
                                 spot = selectedSpot.value ?: noneSpotLabel,
+                                vehicleType = selectedVehicleType.value,
                             )
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))
@@ -409,6 +415,13 @@ fun SaveParkingScreen(
                                 )
                             }
                         }
+                    }
+
+                    item {
+                        VehicleTypeSelector(
+                            selectedVehicle = selectedVehicleType.value,
+                            onVehicleSelected = { selectedVehicleType.value = it },
+                        )
                     }
 
                     item {
@@ -424,6 +437,7 @@ fun SaveParkingScreen(
                                     latitude = capturedCoordinates.value?.first,
                                     longitude = capturedCoordinates.value?.second,
                                     parkedAt = initialLocation?.parkedAt ?: System.currentTimeMillis(),
+                                    vehicleType = selectedVehicleType.value,
                                     createdAt = initialLocation?.createdAt ?: System.currentTimeMillis(),
                                     updatedAt = System.currentTimeMillis(),
                                 )
@@ -467,6 +481,7 @@ fun SaveParkingScreen(
                                 zone = selectedZone.value.orEmpty(),
                                 row = selectedRow.value.orEmpty(),
                                 spot = selectedSpot.value ?: noneSpotLabel,
+                                vehicleType = selectedVehicleType.value,
                             )
                             if (capturedCoordinates.value != null) {
                                 Spacer(modifier = Modifier.size(spacing.SpaceXs))

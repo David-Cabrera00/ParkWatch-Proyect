@@ -3,6 +3,11 @@
     <string name="location_zone">Zona</string>
     <string name="location_row">Fila</string>
     <string name="location_spot">Puesto</string>
+    <string name="vehicle_type_title">Vehículo</string>
+    <string name="vehicle_type_car">Auto</string>
+    <string name="vehicle_type_motorcycle">Moto</string>
+    <string name="vehicle_type_bicycle">Bici</string>
+    <string name="vehicle_type_scooter">Scooter</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_system">Sistema</string>
