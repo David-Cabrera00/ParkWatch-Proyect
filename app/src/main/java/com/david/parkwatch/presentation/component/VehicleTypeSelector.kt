@@ -46,10 +46,14 @@ fun VehicleTypeSelector(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.SpaceXs),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            VehicleType.entries.forEach { vehicle ->
+            VehicleType.entries.forEachIndexed { index, vehicle ->
+                if (index > 0) {
+                    Spacer(modifier = Modifier.size(6.dp))
+                }
                 val isSelected = vehicle == selectedVehicle
                 val background = if (isSelected) colors.primaryContainer else colors.surfaceContainer
                 val tint = if (isSelected) colors.onPrimaryContainer else colors.onSurfaceVariant
@@ -59,7 +63,7 @@ fun VehicleTypeSelector(
 
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(33.dp)
                         .clip(CircleShape)
                         .then(borderModifier)
                         .background(background)
@@ -74,7 +78,7 @@ fun VehicleTypeSelector(
                     Icon(
                         painter = painterResource(vehicle.iconRes),
                         contentDescription = stringResource(vehicle.labelRes),
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(18.dp),
                         tint = tint,
                     )
                 }
