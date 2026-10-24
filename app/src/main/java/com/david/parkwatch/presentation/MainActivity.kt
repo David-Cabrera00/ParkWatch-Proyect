@@ -72,7 +72,10 @@ fun WearApp(destination: String? = null) {
         ParkThemeMode.DARK -> true
     }
 
-    ParkWatchTheme(darkTheme = darkTheme) {
+    ParkWatchTheme(
+        darkTheme = darkTheme,
+        accentColor = preferences.accentColor,
+    ) {
         ParkWatchNavHost(
             preferences = preferences,
             destination = destination,
