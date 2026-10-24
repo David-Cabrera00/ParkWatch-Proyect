@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +33,7 @@ import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
+import com.david.parkwatch.presentation.util.TimeFormatter
 
 @Composable
 fun HomeScreen(
@@ -41,11 +43,14 @@ fun HomeScreen(
     onQuickSaveClick: () -> Unit = {},
     onVoiceClick: () -> Unit = {},
     onViewVehicleClick: () -> Unit = {},
+    onCompassClick: () -> Unit = {},
+    onHistoryClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
     val listState = rememberScalingLazyListState()
+    val context = LocalContext.current
 
     ScreenScaffold(
         modifier = modifier
@@ -138,6 +143,12 @@ fun HomeScreen(
                 }
                 item {
                     ParkSecondaryButton(
+                        onClick = onHistoryClick,
+                        label = stringResource(R.string.history_title),
+                    )
+                }
+                item {
+                    ParkSecondaryButton(
                         onClick = onSettingsClick,
                         label = stringResource(R.string.settings_open),
                     )
@@ -179,18 +190,40 @@ fun HomeScreen(
                         row = location.row,
                         spot = location.spot,
                         vehicleType = location.vehicleType,
-                        elapsedTime = stringResource(R.string.detail_time_minutes, elapsedMinutes),
+                        elapsedTime = TimeFormatter.formatElapsedTime(location.parkedAt, context),
                         timerInfo = timerInfo,
                         isTimerExpired = isExpired,
+                        onClick = onViewVehicleClick,
                     )
                 }
                 item {
                     Spacer(modifier = Modifier.size(spacing.SpaceSm))
                 }
+                if (location.latitude != null && location.longitude != null) {
+                    item {
+                        ParkPrimaryButton(
+                            onClick = onCompassClick,
+                            label = stringResource(R.string.compass_guide_me),
+                        )
+                    }
+                    item {
+                        ParkSecondaryButton(
+                            onClick = onViewVehicleClick,
+                            label = stringResource(R.string.home_view_vehicle),
+                        )
+                    }
+                } else {
+                    item {
+                        ParkPrimaryButton(
+                            onClick = onViewVehicleClick,
+                            label = stringResource(R.string.home_view_vehicle),
+                        )
+                    }
+                }
                 item {
-                    ParkPrimaryButton(
-                        onClick = onViewVehicleClick,
-                        label = stringResource(R.string.home_view_vehicle),
+                    ParkSecondaryButton(
+                        onClick = onHistoryClick,
+                        label = stringResource(R.string.history_title),
                     )
                 }
                 item {
