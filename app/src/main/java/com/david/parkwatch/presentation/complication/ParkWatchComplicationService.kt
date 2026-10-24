@@ -15,6 +15,8 @@ import androidx.wear.watchface.complications.datasource.SuspendingComplicationDa
 import com.david.parkwatch.R
 import com.david.parkwatch.data.repository.ParkingRepository
 import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.presentation.model.iconRes
+import com.david.parkwatch.presentation.model.labelRes
 import com.david.parkwatch.presentation.MainActivity
 
 class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
@@ -52,8 +54,9 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        val carIcon = MonochromaticImage.Builder(
-            Icon.createWithResource(this, R.drawable.ic_directions_car),
+        val vehicleIconRes = location?.vehicleType?.iconRes ?: R.drawable.ic_directions_car
+        val vehicleIcon = MonochromaticImage.Builder(
+            Icon.createWithResource(this, vehicleIconRes),
         ).build()
 
         return when (type) {
@@ -66,7 +69,7 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
                         contentDescription = PlainComplicationText.Builder(getString(R.string.home_saved_title)).build(),
                     )
                         .setTitle(PlainComplicationText.Builder(title).build())
-                        .setMonochromaticImage(carIcon)
+                        .setMonochromaticImage(vehicleIcon)
                         .setTapAction(tapAction)
                         .build()
                 } else {
@@ -75,7 +78,7 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
                         contentDescription = PlainComplicationText.Builder(getString(R.string.home_empty_title)).build(),
                     )
                         .setTitle(PlainComplicationText.Builder(getString(R.string.complication_empty_title)).build())
-                        .setMonochromaticImage(carIcon)
+                        .setMonochromaticImage(vehicleIcon)
                         .setTapAction(tapAction)
                         .build()
                 }
@@ -92,8 +95,8 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
                         text = PlainComplicationText.Builder(fullLocation).build(),
                         contentDescription = PlainComplicationText.Builder(getString(R.string.home_saved_title)).build(),
                     )
-                        .setTitle(PlainComplicationText.Builder(getString(R.string.app_name)).build())
-                        .setMonochromaticImage(carIcon)
+                        .setTitle(PlainComplicationText.Builder(getString(location.vehicleType.labelRes)).build())
+                        .setMonochromaticImage(vehicleIcon)
                         .setTapAction(tapAction)
                         .build()
                 } else {
@@ -102,14 +105,14 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
                         contentDescription = PlainComplicationText.Builder(getString(R.string.home_empty_title)).build(),
                     )
                         .setTitle(PlainComplicationText.Builder(getString(R.string.app_name)).build())
-                        .setMonochromaticImage(carIcon)
+                        .setMonochromaticImage(vehicleIcon)
                         .setTapAction(tapAction)
                         .build()
                 }
             }
             ComplicationType.MONOCHROMATIC_IMAGE -> {
                 MonochromaticImageComplicationData.Builder(
-                    monochromaticImage = carIcon,
+                    monochromaticImage = vehicleIcon,
                     contentDescription = PlainComplicationText.Builder(getString(R.string.app_name)).build(),
                 )
                     .setTapAction(tapAction)
