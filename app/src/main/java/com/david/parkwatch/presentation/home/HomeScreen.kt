@@ -59,10 +59,10 @@ fun HomeScreen(
                 .padding(contentPadding)
                 .parkRotaryScroll(listState),
             contentPadding = PaddingValues(
-                top = spacing.SpaceMd,
-                bottom = spacing.SpaceXl,
-                start = spacing.SpaceMd,
-                end = spacing.SpaceMd,
+                top = 28.dp,
+                bottom = 48.dp,
+                start = 14.dp,
+                end = 14.dp,
             ),
             verticalArrangement = Arrangement.spacedBy(spacing.SpaceXs),
             horizontalAlignment = Alignment.CenterHorizontally,
