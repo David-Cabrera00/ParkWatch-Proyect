@@ -4,8 +4,12 @@ import android.Manifest
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -57,6 +62,7 @@ import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.component.VehicleTypeSelector
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
+import com.david.parkwatch.presentation.util.ParkHaptics
 import java.util.UUID
 
 private enum class SaveStep {
@@ -197,29 +203,11 @@ fun SaveParkingScreen(
             when (currentStep.value) {
                 SaveStep.FLOOR -> {
                     item {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.save_parking_step, 1),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = colors.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = colors.onBackground,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_floor_prompt),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colors.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                        }
+                        StepHeader(
+                            currentStepNumber = 1,
+                            title = stringResource(R.string.save_parking_title),
+                            prompt = stringResource(R.string.save_parking_floor_prompt),
+                        )
                     }
 
                     items(floors) { option ->
@@ -271,29 +259,11 @@ fun SaveParkingScreen(
 
                 SaveStep.ZONE -> {
                     item {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.save_parking_step, 2),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = colors.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = colors.onBackground,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_zone_prompt),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colors.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                        }
+                        StepHeader(
+                            currentStepNumber = 2,
+                            title = stringResource(R.string.save_parking_title),
+                            prompt = stringResource(R.string.save_parking_zone_prompt),
+                        )
                     }
 
                     item {
@@ -360,29 +330,11 @@ fun SaveParkingScreen(
 
                 SaveStep.ROW -> {
                     item {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.save_parking_step, 3),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = colors.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = colors.onBackground,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_row_prompt),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colors.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                        }
+                        StepHeader(
+                            currentStepNumber = 3,
+                            title = stringResource(R.string.save_parking_title),
+                            prompt = stringResource(R.string.save_parking_row_prompt),
+                        )
                     }
 
                     item {
@@ -471,29 +423,11 @@ fun SaveParkingScreen(
 
                 SaveStep.SPOT -> {
                     item {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.save_parking_step, 4),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = colors.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = colors.onBackground,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
-                            Text(
-                                text = stringResource(R.string.save_parking_spot_prompt),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colors.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                            )
-                        }
+                        StepHeader(
+                            currentStepNumber = 4,
+                            title = stringResource(R.string.save_parking_title),
+                            prompt = stringResource(R.string.save_parking_spot_prompt),
+                        )
                     }
 
                     item {
@@ -684,7 +618,7 @@ fun SaveParkingScreen(
                     item {
                         ParkPrimaryButton(
                             onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                ParkHaptics.playSuccess(context)
                                 val location = ParkingLocation(
                                     id = initialLocation?.id ?: UUID.randomUUID().toString(),
                                     floor = selectedFloor.value.orEmpty(),
@@ -768,5 +702,61 @@ fun SaveParkingScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun StepHeader(
+    currentStepNumber: Int,
+    totalSteps: Int = 4,
+    title: String,
+    prompt: String,
+) {
+    val colors = parkColors()
+    val spacing = parkSpacing()
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            for (step in 1..totalSteps) {
+                val isActive = step == currentStepNumber
+                val isCompleted = step < currentStepNumber
+                val pillWidth by animateDpAsState(
+                    targetValue = if (isActive) 18.dp else 6.dp,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                    label = "stepPillWidth",
+                )
+                val pillColor = if (isActive) colors.primary else if (isCompleted) colors.primary.copy(alpha = 0.5f) else colors.surfaceContainerHigh
+
+                Box(
+                    modifier = Modifier
+                        .height(4.dp)
+                        .width(pillWidth)
+                        .clip(RoundedCornerShape(50))
+                        .background(pillColor),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.size(spacing.SpaceXs))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = colors.onBackground,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+        )
+        Spacer(modifier = Modifier.size(spacing.SpaceXs))
+        Text(
+            text = prompt,
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+        )
     }
 }
