@@ -9,6 +9,7 @@ import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.MonochromaticImageComplicationData
 import androidx.wear.watchface.complications.data.PlainComplicationText
+import androidx.wear.watchface.complications.data.RangedValueComplicationData
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
@@ -29,6 +30,7 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
             row = "14",
             spot = "27",
             parkedAt = System.currentTimeMillis() - 15 * 60_000L,
+            expiresAt = System.currentTimeMillis() + 45 * 60_000L,
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis(),
         )
@@ -45,12 +47,18 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
         type: ComplicationType,
         location: ParkingLocation?,
     ): ComplicationData? {
+        val destination = when {
+            type == ComplicationType.RANGED_VALUE && location?.expiresAt != null -> MainActivity.DESTINATION_TIMER
+            location != null -> MainActivity.DESTINATION_DETAIL
+            else -> MainActivity.DESTINATION_SAVE
+        }
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_DESTINATION, destination)
         }
         val tapAction = PendingIntent.getActivity(
             this,
-            0,
+            type.ordinal,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
@@ -117,6 +125,51 @@ class ParkWatchComplicationService : SuspendingComplicationDataSourceService() {
                 )
                     .setTapAction(tapAction)
                     .build()
+            }
+            ComplicationType.RANGED_VALUE -> {
+                if (location != null && location.expiresAt != null) {
+                    val now = System.currentTimeMillis()
+                    val totalMinutes = ((location.expiresAt - location.parkedAt) / 60_000f).coerceAtLeast(1f)
+                    val remainingMinutes = ((location.expiresAt - now) / 60_000f).coerceIn(0f, totalMinutes)
+                    val remInt = ((location.expiresAt - now) / 60_000L)
+                    val displayTime = if (remInt <= 0) "0m" else "${remInt}m"
+
+                    RangedValueComplicationData.Builder(
+                        value = remainingMinutes,
+                        min = 0f,
+                        max = totalMinutes,
+                        contentDescription = PlainComplicationText.Builder(getString(R.string.timer_notification_warning_title)).build(),
+                    )
+                        .setText(PlainComplicationText.Builder(displayTime).build())
+                        .setTitle(PlainComplicationText.Builder(location.floor).build())
+                        .setMonochromaticImage(vehicleIcon)
+                        .setTapAction(tapAction)
+                        .build()
+                } else if (location != null) {
+                    RangedValueComplicationData.Builder(
+                        value = 1f,
+                        min = 0f,
+                        max = 1f,
+                        contentDescription = PlainComplicationText.Builder(getString(R.string.home_saved_title)).build(),
+                    )
+                        .setText(PlainComplicationText.Builder(location.floor).build())
+                        .setTitle(PlainComplicationText.Builder(location.zone).build())
+                        .setMonochromaticImage(vehicleIcon)
+                        .setTapAction(tapAction)
+                        .build()
+                } else {
+                    RangedValueComplicationData.Builder(
+                        value = 0f,
+                        min = 0f,
+                        max = 1f,
+                        contentDescription = PlainComplicationText.Builder(getString(R.string.home_empty_title)).build(),
+                    )
+                        .setText(PlainComplicationText.Builder(getString(R.string.complication_empty_text)).build())
+                        .setTitle(PlainComplicationText.Builder(getString(R.string.complication_empty_title)).build())
+                        .setMonochromaticImage(vehicleIcon)
+                        .setTapAction(tapAction)
+                        .build()
+                }
             }
             else -> null
         }

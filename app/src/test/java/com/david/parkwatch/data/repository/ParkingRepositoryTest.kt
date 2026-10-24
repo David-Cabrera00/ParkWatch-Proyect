@@ -144,6 +144,27 @@ class ParkingRepositoryTest {
         }
     }
 
+    @Test
+    fun saveParkingLocation_recordsHistoryAndPreservesOnClearLocation() {
+        val loc1 = createLocation(id = "1", floor = "P1", zone = "A")
+        val loc2 = createLocation(id = "2", floor = "P2", zone = "B")
+
+        repository.saveParkingLocation(loc1)
+        repository.saveParkingLocation(loc2)
+
+        val history = repository.getParkingHistory()
+        assertEquals(2, history.size)
+        assertEquals("2", history[0].id)
+        assertEquals("1", history[1].id)
+
+        repository.clearParkingLocation()
+        assertNull(repository.getParkingLocation())
+        assertEquals(2, repository.getParkingHistory().size)
+
+        repository.clearParkingHistory()
+        assertEquals(0, repository.getParkingHistory().size)
+    }
+
     private fun createLocation(
         id: String = "test-id",
         floor: String = "P1",

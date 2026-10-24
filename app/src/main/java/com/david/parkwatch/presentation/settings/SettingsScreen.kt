@@ -24,6 +24,7 @@ import com.david.parkwatch.R
 import com.david.parkwatch.data.preferences.AppPreferences
 import com.david.parkwatch.data.preferences.ParkLanguage
 import com.david.parkwatch.data.preferences.ParkThemeMode
+import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
@@ -33,6 +34,7 @@ fun SettingsScreen(
     preferences: AppPreferences,
     onThemeSelected: (ParkThemeMode) -> Unit,
     onLanguageSelected: (ParkLanguage) -> Unit,
+    onHistoryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val colors = parkColors()
@@ -113,6 +115,13 @@ fun SettingsScreen(
                     label = stringResource(R.string.settings_language_english),
                     selected = preferences.language == ParkLanguage.ENGLISH,
                     onSelect = { onLanguageSelected(ParkLanguage.ENGLISH) },
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                ParkSecondaryButton(
+                    onClick = onHistoryClick,
+                    label = stringResource(R.string.history_title),
                 )
             }
         }

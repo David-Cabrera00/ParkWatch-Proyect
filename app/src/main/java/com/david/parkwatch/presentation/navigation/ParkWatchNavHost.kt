@@ -5,9 +5,11 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.speech.RecognizerIntent
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -22,9 +24,11 @@ import com.david.parkwatch.data.timer.ParkingTimerManager
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.parser.ParsedParkingInfo
 import com.david.parkwatch.domain.parser.VoiceParkingParser
+import com.david.parkwatch.presentation.MainActivity
 import com.david.parkwatch.presentation.compass.CompassScreen
 import com.david.parkwatch.presentation.complication.ParkWatchComplicationManager
 import com.david.parkwatch.presentation.detail.ParkingDetailScreen
+import com.david.parkwatch.presentation.history.HistoryScreen
 import com.david.parkwatch.presentation.home.HomeScreen
 import com.david.parkwatch.presentation.save.SaveParkingScreen
 import com.david.parkwatch.presentation.settings.SettingsScreen
@@ -39,11 +43,13 @@ private const val EditRoute = "edit"
 private const val SettingsRoute = "settings"
 private const val TimerRoute = "timer"
 private const val CompassRoute = "compass"
+private const val HistoryRoute = "history"
 
 @Composable
 fun ParkWatchNavHost(
     preferences: AppPreferences,
     onPreferencesChanged: (AppPreferences) -> Unit,
+    destination: String? = null,
 ) {
     val context = LocalContext.current
     val repository = remember { ParkingRepository(context) }
@@ -51,6 +57,37 @@ fun ParkWatchNavHost(
     val savedLocation = remember { mutableStateOf<ParkingLocation?>(repository.getParkingLocation()) }
     val voiceParsedInfo = remember { mutableStateOf<ParsedParkingInfo?>(null) }
     val navController = rememberSwipeDismissableNavController()
+
+    LaunchedEffect(destination) {
+        if (!destination.isNullOrBlank()) {
+            when (destination) {
+                MainActivity.DESTINATION_COMPASS -> {
+                    if (savedLocation.value?.latitude != null && savedLocation.value?.longitude != null) {
+                        navController.navigate(CompassRoute)
+                    } else if (savedLocation.value != null) {
+                        navController.navigate(DetailRoute)
+                    }
+                }
+                MainActivity.DESTINATION_DETAIL -> {
+                    if (savedLocation.value != null) {
+                        navController.navigate(DetailRoute)
+                    }
+                }
+                MainActivity.DESTINATION_SAVE -> {
+                    voiceParsedInfo.value = null
+                    navController.navigate(SaveRoute)
+                }
+                MainActivity.DESTINATION_TIMER -> {
+                    if (savedLocation.value != null) {
+                        navController.navigate(TimerRoute)
+                    }
+                }
+                MainActivity.DESTINATION_HISTORY -> {
+                    navController.navigate(HistoryRoute)
+                }
+            }
+        }
+    }
 
     fun performQuickSave(coords: Pair<Double, Double>?) {
         val now = System.currentTimeMillis()
@@ -139,6 +176,8 @@ fun ParkWatchNavHost(
                     }
                 },
                 onViewVehicleClick = { navController.navigate(DetailRoute) },
+                onCompassClick = { navController.navigate(CompassRoute) },
+                onHistoryClick = { navController.navigate(HistoryRoute) },
                 onSettingsClick = { navController.navigate(SettingsRoute) },
             )
         }
@@ -191,6 +230,15 @@ fun ParkWatchNavHost(
                     vehicleType = location.vehicleType,
                     onNavigateBack = {
                         navController.popBackStack()
+                    },
+                    onClearLocation = {
+                        ParkingTimerManager.cancelTimer(context)
+                        repository.clearParkingLocation()
+                        savedLocation.value = null
+                        ParkWatchTileManager.requestUpdate(context)
+                        ParkWatchComplicationManager.requestUpdate(context)
+                        Toast.makeText(context, context.getString(R.string.compass_finished_toast), Toast.LENGTH_SHORT).show()
+                        navController.popBackStack(HomeRoute, inclusive = false)
                     },
                 )
             } else {
@@ -247,6 +295,24 @@ fun ParkWatchNavHost(
                 preferences = preferences,
                 onThemeSelected = { mode -> onPreferencesChanged(preferences.copy(themeMode = mode)) },
                 onLanguageSelected = { language -> onPreferencesChanged(preferences.copy(language = language)) },
+                onHistoryClick = { navController.navigate(HistoryRoute) },
+            )
+        }
+        composable(HistoryRoute) {
+            val history = remember { mutableStateOf(repository.getParkingHistory()) }
+            HistoryScreen(
+                historyList = history.value,
+                onSelectLocation = { selected ->
+                    repository.saveParkingLocation(selected)
+                    savedLocation.value = selected
+                    ParkWatchTileManager.requestUpdate(context)
+                    ParkWatchComplicationManager.requestUpdate(context)
+                    navController.navigate(DetailRoute)
+                },
+                onClearHistory = {
+                    repository.clearParkingHistory()
+                    history.value = emptyList()
+                },
             )
         }
     }

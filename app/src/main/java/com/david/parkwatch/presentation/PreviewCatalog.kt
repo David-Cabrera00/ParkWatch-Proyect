@@ -5,6 +5,8 @@ import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import com.david.parkwatch.data.preferences.AppPreferences
 import com.david.parkwatch.data.preferences.ParkLanguage
 import com.david.parkwatch.data.preferences.ParkThemeMode
+import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.domain.model.VehicleType
 import com.david.parkwatch.presentation.component.ParkLocationCard
 import com.david.parkwatch.presentation.home.HomeScreen
 import com.david.parkwatch.presentation.settings.SettingsScreen
@@ -110,7 +112,7 @@ fun MotorcycleLocationCardPreview() {
             zone = "M",
             row = "3",
             spot = "12",
-            vehicleType = com.david.parkwatch.domain.model.VehicleType.MOTORCYCLE,
+            vehicleType = VehicleType.MOTORCYCLE,
             elapsedTime = "Estacionado hace 10 min",
         )
     }
@@ -123,7 +125,7 @@ fun CompassPreview() {
         com.david.parkwatch.presentation.compass.CompassScreen(
             targetLatitude = 40.416775,
             targetLongitude = -3.703790,
-            vehicleType = com.david.parkwatch.domain.model.VehicleType.CAR,
+            vehicleType = VehicleType.CAR,
             onNavigateBack = {},
         )
     }
@@ -141,6 +143,42 @@ fun LocationCardWithTimerPreview() {
             elapsedTime = "Estacionado hace 25 min",
             timerInfo = "Vence en 35 min",
             isTimerExpired = false,
+        )
+    }
+}
+
+@WearPreviewDevices
+@Composable
+fun HistoryScreenPreview() {
+    val sampleHistory = listOf(
+        ParkingLocation(
+            id = "1",
+            floor = "P1",
+            zone = "A",
+            row = "1",
+            spot = "30",
+            parkedAt = System.currentTimeMillis() - 25 * 60_000L,
+            vehicleType = VehicleType.CAR,
+            createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis(),
+        ),
+        ParkingLocation(
+            id = "2",
+            floor = "B2",
+            zone = "C",
+            row = "5",
+            spot = "12",
+            parkedAt = System.currentTimeMillis() - 180 * 60_000L,
+            vehicleType = VehicleType.MOTORCYCLE,
+            createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis(),
+        ),
+    )
+    ParkWatchTheme(darkTheme = true) {
+        com.david.parkwatch.presentation.history.HistoryScreen(
+            historyList = sampleHistory,
+            onSelectLocation = {},
+            onClearHistory = {},
         )
     }
 }

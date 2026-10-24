@@ -151,7 +151,12 @@ fun SaveParkingScreen(
             SaveStep.ZONE -> SaveStep.FLOOR
             SaveStep.ROW -> SaveStep.ZONE
             SaveStep.SPOT -> SaveStep.ROW
-            SaveStep.REVIEW -> SaveStep.SPOT
+            SaveStep.REVIEW -> {
+                if (selectedSpot.value != null) SaveStep.SPOT
+                else if (selectedRow.value != null && selectedRow.value != "—") SaveStep.ROW
+                else if (selectedZone.value != null) SaveStep.ZONE
+                else SaveStep.FLOOR
+            }
             SaveStep.CONFIRMATION -> {
                 onNavigateBack()
                 SaveStep.CONFIRMATION
@@ -180,22 +185,11 @@ fun SaveParkingScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (currentStep.value) {
-                SaveStep.FLOOR, SaveStep.ZONE, SaveStep.ROW -> {
-                    val options = when (currentStep.value) {
-                        SaveStep.FLOOR -> floors
-                        SaveStep.ZONE -> zones
-                        else -> rows
-                    }
-                    val promptRes = when (currentStep.value) {
-                        SaveStep.FLOOR -> R.string.save_parking_floor_prompt
-                        SaveStep.ZONE -> R.string.save_parking_zone_prompt
-                        else -> R.string.save_parking_row_prompt
-                    }
-
+                SaveStep.FLOOR -> {
                     item {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = stringResource(R.string.save_parking_step, currentStep.value.ordinal + 1),
+                                text = stringResource(R.string.save_parking_step, 1),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = colors.onSurfaceVariant,
                             )
@@ -209,7 +203,7 @@ fun SaveParkingScreen(
                             )
                             Spacer(modifier = Modifier.size(spacing.SpaceXs))
                             Text(
-                                text = stringResource(promptRes),
+                                text = stringResource(R.string.save_parking_floor_prompt),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colors.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
@@ -218,47 +212,13 @@ fun SaveParkingScreen(
                         }
                     }
 
-                    if (currentStep.value == SaveStep.ZONE) {
-                        item {
-                            Row(horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm)) {
-                                zones.forEach { option ->
-                                    Text(
-                                        text = option,
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .clip(RoundedCornerShape(50))
-                                            .background(if (selectedZone.value == option) colors.primaryContainer else colors.surfaceContainer)
-                                            .selectable(
-                                                selected = selectedZone.value == option,
-                                                onClick = {
-                                                    selectedZone.value = option
-                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                },
-                                                role = Role.RadioButton,
-                                            )
-                                            .wrapContentSize(Alignment.Center),
-                                        style = MaterialTheme.typography.titleSmall,
-                                        color = if (selectedZone.value == option) colors.onPrimaryContainer else colors.onSurface,
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                    items(options) { option ->
-                        val isSelected = when (currentStep.value) {
-                            SaveStep.FLOOR -> selectedFloor.value == option
-                            SaveStep.ZONE -> selectedZone.value == option
-                            else -> selectedRow.value == option
-                        }
+                    items(floors) { option ->
                         RadioButton(
-                            selected = isSelected,
+                            selected = selectedFloor.value == option,
                             onSelect = {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                when (currentStep.value) {
-                                    SaveStep.FLOOR -> selectedFloor.value = option
-                                    SaveStep.ZONE -> selectedZone.value = option
-                                    else -> selectedRow.value = option
-                                }
+                                selectedFloor.value = option
+                                currentStep.value = SaveStep.ZONE
                             },
                             colors = RadioButtonDefaults.radioButtonColors(
                                 selectedContainerColor = colors.primaryContainer,
@@ -276,25 +236,188 @@ fun SaveParkingScreen(
                             },
                         )
                     }
+
+                    if (selectedFloor.value != null) {
+                        item {
+                            ParkPrimaryButton(
+                                onClick = { currentStep.value = SaveStep.ZONE },
+                                label = stringResource(R.string.save_parking_continue),
+                            )
+                        }
+                    }
+                }
+
+                SaveStep.ZONE -> {
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(R.string.save_parking_step, 2),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = colors.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = stringResource(R.string.save_parking_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = stringResource(R.string.save_parking_zone_prompt),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                        }
                     }
 
                     item {
-                        val isEnabled = when (currentStep.value) {
-                            SaveStep.FLOOR -> selectedFloor.value != null
-                            SaveStep.ZONE -> selectedZone.value != null
-                            else -> selectedRow.value != null
+                        Row(horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm)) {
+                            zones.forEach { option ->
+                                Text(
+                                    text = option,
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(50))
+                                        .background(if (selectedZone.value == option) colors.primaryContainer else colors.surfaceContainer)
+                                        .selectable(
+                                            selected = selectedZone.value == option,
+                                            onClick = {
+                                                selectedZone.value = option
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                currentStep.value = SaveStep.ROW
+                                            },
+                                            role = Role.RadioButton,
+                                        )
+                                        .wrapContentSize(Alignment.Center),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = if (selectedZone.value == option) colors.onPrimaryContainer else colors.onSurface,
+                                )
+                            }
                         }
-                        ParkPrimaryButton(
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                    }
+
+                    item {
+                        ParkSecondaryButton(
                             onClick = {
-                                when (currentStep.value) {
-                                    SaveStep.FLOOR -> currentStep.value = SaveStep.ZONE
-                                    SaveStep.ZONE -> currentStep.value = SaveStep.ROW
-                                    else -> currentStep.value = SaveStep.SPOT
-                                }
+                                if (selectedRow.value == null) selectedRow.value = "—"
+                                currentStep.value = SaveStep.REVIEW
                             },
-                            label = stringResource(R.string.save_parking_continue),
-                            enabled = isEnabled,
+                            label = stringResource(R.string.save_parking_jump_to_review),
                         )
+                    }
+
+                    if (selectedZone.value != null) {
+                        item {
+                            ParkPrimaryButton(
+                                onClick = { currentStep.value = SaveStep.ROW },
+                                label = stringResource(R.string.save_parking_continue),
+                            )
+                        }
+                    }
+                }
+
+                SaveStep.ROW -> {
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(R.string.save_parking_step, 3),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = colors.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = stringResource(R.string.save_parking_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                            Spacer(modifier = Modifier.size(spacing.SpaceXs))
+                            Text(
+                                text = stringResource(R.string.save_parking_row_prompt),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                            )
+                        }
+                    }
+
+                    item {
+                        RadioButton(
+                            selected = selectedRow.value == "—" || selectedRow.value == null,
+                            onSelect = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                selectedRow.value = "—"
+                                currentStep.value = SaveStep.REVIEW
+                            },
+                            colors = RadioButtonDefaults.radioButtonColors(
+                                selectedContainerColor = colors.primaryContainer,
+                                selectedContentColor = colors.onPrimaryContainer,
+                                selectedControlColor = colors.primary,
+                                unselectedContainerColor = colors.surfaceContainer,
+                                unselectedContentColor = colors.onSurface,
+                                unselectedControlColor = colors.onSurfaceVariant,
+                            ),
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.save_parking_row_none),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            },
+                        )
+                    }
+
+                    items(rows) { option ->
+                        RadioButton(
+                            selected = selectedRow.value == option,
+                            onSelect = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                selectedRow.value = option
+                                currentStep.value = SaveStep.SPOT
+                            },
+                            colors = RadioButtonDefaults.radioButtonColors(
+                                selectedContainerColor = colors.primaryContainer,
+                                selectedContentColor = colors.onPrimaryContainer,
+                                selectedControlColor = colors.primary,
+                                unselectedContainerColor = colors.surfaceContainer,
+                                unselectedContentColor = colors.onSurface,
+                                unselectedControlColor = colors.onSurfaceVariant,
+                            ),
+                            label = {
+                                Text(
+                                    text = option,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            },
+                        )
+                    }
+
+                    item {
+                        ParkSecondaryButton(
+                            onClick = {
+                                if (selectedRow.value == null) selectedRow.value = "—"
+                                currentStep.value = SaveStep.REVIEW
+                            },
+                            label = stringResource(R.string.save_parking_jump_to_review),
+                        )
+                    }
+
+                    if (selectedRow.value != null && selectedRow.value != "—") {
+                        item {
+                            ParkPrimaryButton(
+                                onClick = { currentStep.value = SaveStep.SPOT },
+                                label = stringResource(R.string.save_parking_continue),
+                            )
+                        }
                     }
                 }
 
@@ -302,7 +425,7 @@ fun SaveParkingScreen(
                     item {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = stringResource(R.string.save_parking_step, currentStep.value.ordinal + 1),
+                                text = stringResource(R.string.save_parking_step, 4),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = colors.onSurfaceVariant,
                             )
@@ -331,6 +454,7 @@ fun SaveParkingScreen(
                             onSelect = {
                                 selectedSpot.value = null
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                currentStep.value = SaveStep.REVIEW
                             },
                             colors = RadioButtonDefaults.radioButtonColors(
                                 selectedContainerColor = colors.primaryContainer,
@@ -355,6 +479,7 @@ fun SaveParkingScreen(
                             onSelect = {
                                 selectedSpot.value = spot
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                currentStep.value = SaveStep.REVIEW
                             },
                             colors = RadioButtonDefaults.radioButtonColors(
                                 selectedContainerColor = colors.primaryContainer,
@@ -374,17 +499,11 @@ fun SaveParkingScreen(
                     }
 
                     item {
-                        val buttonLabel = if (selectedSpot.value != null) {
-                            stringResource(R.string.save_parking_continue)
-                        } else {
-                            stringResource(R.string.save_parking_spot_skip)
-                        }
                         ParkPrimaryButton(
                             onClick = {
                                 currentStep.value = SaveStep.REVIEW
                             },
-                            label = buttonLabel,
-                            enabled = true,
+                            label = stringResource(R.string.save_parking_continue),
                         )
                     }
                 }
@@ -402,8 +521,8 @@ fun SaveParkingScreen(
                             Spacer(modifier = Modifier.size(spacing.SpaceSm))
                             ParkLocationCard(
                                 floor = selectedFloor.value.orEmpty(),
-                                zone = selectedZone.value.orEmpty(),
-                                row = selectedRow.value.orEmpty(),
+                                zone = selectedZone.value.orEmpty().ifEmpty { "—" },
+                                row = selectedRow.value.orEmpty().ifEmpty { "—" },
                                 spot = selectedSpot.value ?: noneSpotLabel,
                                 vehicleType = selectedVehicleType.value,
                             )
@@ -480,8 +599,8 @@ fun SaveParkingScreen(
                             Spacer(modifier = Modifier.size(spacing.SpaceMd))
                             ParkLocationCard(
                                 floor = selectedFloor.value.orEmpty(),
-                                zone = selectedZone.value.orEmpty(),
-                                row = selectedRow.value.orEmpty(),
+                                zone = selectedZone.value.orEmpty().ifEmpty { "—" },
+                                row = selectedRow.value.orEmpty().ifEmpty { "—" },
                                 spot = selectedSpot.value ?: noneSpotLabel,
                                 vehicleType = selectedVehicleType.value,
                             )
