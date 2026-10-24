@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.ParkingLocation
+import com.david.parkwatch.domain.model.VehicleType
 import com.david.parkwatch.presentation.save.SaveParkingScreen
 import com.david.parkwatch.presentation.theme.ParkWatchTheme
 import org.junit.Assert.assertEquals
@@ -59,6 +60,7 @@ class SaveParkingScreenTest {
         assertEquals("B", savedLocation?.zone)
         assertEquals("14", savedLocation?.row)
         assertEquals("27", savedLocation?.spot)
+        assertEquals(VehicleType.CAR, savedLocation?.vehicleType)
         assertEquals("edit-test-id", savedLocation?.id)
     }
 
