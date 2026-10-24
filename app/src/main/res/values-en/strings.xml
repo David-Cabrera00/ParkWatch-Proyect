@@ -31,6 +31,8 @@
     <string name="save_parking_floor_prompt">Select the floor</string>
     <string name="save_parking_zone_prompt">Select the zone</string>
     <string name="save_parking_row_prompt">Select the row</string>
+    <string name="save_parking_row_none">No row</string>
+    <string name="save_parking_jump_to_review">Done / Save now</string>
     <string name="save_parking_continue">Continue</string>
     <string name="save_parking_step">Step %1$d of 4</string>
     <string name="save_parking_spot_prompt">Spot (optional)</string>
@@ -49,7 +51,9 @@
     <string name="detail_title">Your vehicle</string>
     <string name="detail_time_just_now">Just now</string>
     <string name="detail_time_minutes">%1$d min ago</string>
+    <string name="detail_time_hours">%1$d h ago</string>
     <string name="detail_time_hours_minutes">%1$d h %2$d min ago</string>
+    <string name="detail_time_days">%1$d d ago</string>
     <string name="detail_edit">Edit location</string>
     <string name="detail_delete">Delete location</string>
     <string name="delete_confirm_title">Delete location?</string>
@@ -57,6 +61,7 @@
     <string name="delete_confirm_cancel">Cancel</string>
     <string name="delete_confirm_delete">Delete</string>
     <string name="detail_open_map">Open map</string>
+    <string name="detail_map_not_found">No maps app (link copied)</string>
     <string name="detail_share">Share location</string>
     <string name="detail_share_copied">Location copied to clipboard</string>
     <string name="share_location_title">My vehicle in ParkWatch:</string>
@@ -68,6 +73,13 @@
     <string name="compass_heading_to">Heading to your %1$s</string>
     <string name="compass_waiting_gps">Searching GPS signal…</string>
     <string name="compass_arrived">You reached your vehicle!</string>
+    <string name="compass_arrived_short">Arrived!</string>
+    <string name="compass_arrived_destination">Arrived at your %1$s</string>
+    <string name="compass_free_spot">Free spot</string>
+    <string name="compass_finish_title">Finish parking?</string>
+    <string name="compass_finish_subtitle">Saved to your history</string>
+    <string name="compass_finish_confirm">Finish</string>
+    <string name="compass_finished_toast">Parking finished and saved to history</string>
     <string name="compass_distance_meters">%1$d m</string>
     <string name="compass_distance_km">%1$.1f km</string>
     <string name="compass_dir_n">North</string>
@@ -123,7 +135,7 @@
     <string name="timer_remaining_hours_minutes">Expires in %1$d h %2$d min</string>
     <string name="timer_expired">Time expired!</string>
     <string name="timer_expired_ago">Expired %1$d min ago</string>
-    <string name="timer_expires_at">Limit: %1$s</string>
+    <string name="timer_expires_at">Ends at %1$s</string>
     <string name="timer_notification_warning_title">ParkWatch: Expiring soon!</string>
     <string name="timer_notification_warning_text">Your parking time expires in 15 minutes</string>
     <string name="timer_notification_expired_title">ParkWatch: Time expired!</string>
@@ -135,4 +147,10 @@
     <string name="timer_preset_1h30">1 h 30 min</string>
     <string name="timer_preset_2h">2 hours</string>
     <string name="timer_preset_3h">3 hours</string>
+    <string name="timer_preset_4h">4 hours</string>
+
+    <!-- History -->
+    <string name="history_title">History</string>
+    <string name="history_empty">No previous records</string>
+    <string name="history_clear">Clear history</string>
 </resources>
