@@ -99,6 +99,7 @@ fun ParkingDetailScreen(
                         zone = location.zone,
                         row = location.row,
                         spot = location.spot,
+                        vehicleType = location.vehicleType,
                         elapsedTime = formatElapsedTime(location.parkedAt),
                     )
                 }
