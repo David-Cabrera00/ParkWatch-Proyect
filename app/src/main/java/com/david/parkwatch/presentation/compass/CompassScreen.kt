@@ -5,7 +5,13 @@ import android.location.Location
 import android.location.LocationListener
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -30,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -55,6 +62,7 @@ import com.david.parkwatch.presentation.model.iconRes
 import com.david.parkwatch.presentation.model.labelRes
 import com.david.parkwatch.presentation.theme.parkColors
 import com.david.parkwatch.presentation.theme.parkSpacing
+import com.david.parkwatch.presentation.util.ParkHaptics
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -151,7 +159,10 @@ fun CompassScreen(
 
     val animatedAngle by animateFloatAsState(
         targetValue = continuousAngle,
-        animationSpec = tween(durationMillis = 150, easing = LinearOutSlowInEasing),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
         label = "compassNeedleAngle",
     )
 
@@ -160,7 +171,7 @@ fun CompassScreen(
     LaunchedEffect(isArrived) {
         if (isArrived && !hasTriggeredArrivalHaptic) {
             hasTriggeredArrivalHaptic = true
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            ParkHaptics.playArrival(context)
         }
     }
 
@@ -216,6 +227,26 @@ fun CompassScreen(
                 )
             }
         } else if (isArrived) {
+            val infiniteTransition = rememberInfiniteTransition(label = "arrivalPulse")
+            val pulseScale by infiniteTransition.animateFloat(
+                initialValue = 1f,
+                targetValue = 1.25f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1200, easing = LinearOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+                label = "pulseScale",
+            )
+            val pulseAlpha by infiniteTransition.animateFloat(
+                initialValue = 0.4f,
+                targetValue = 0.05f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1200, easing = LinearOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+                label = "pulseAlpha",
+            )
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -224,19 +255,30 @@ fun CompassScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .background(colors.primaryContainer),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(vehicleType.iconRes),
-                        contentDescription = stringResource(vehicleType.labelRes),
-                        modifier = Modifier.size(28.dp),
-                        tint = colors.onPrimaryContainer,
+                Box(contentAlignment = Alignment.Center) {
+                    // Halo de pulso
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .scale(pulseScale)
+                            .clip(CircleShape)
+                            .background(colors.primary.copy(alpha = pulseAlpha)),
                     )
+                    // Badge central
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .background(colors.primaryContainer),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(vehicleType.iconRes),
+                            contentDescription = stringResource(vehicleType.labelRes),
+                            modifier = Modifier.size(28.dp),
+                            tint = colors.onPrimaryContainer,
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.size(spacing.SpaceSm))
                 Text(

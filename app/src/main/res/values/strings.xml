@@ -13,6 +13,11 @@
     <string name="settings_theme_system">Sistema</string>
     <string name="settings_theme_light">Claro</string>
     <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_accent_title">Color de acento</string>
+    <string name="settings_accent_emerald">Esmeralda</string>
+    <string name="settings_accent_cyan">Cian eléctrico</string>
+    <string name="settings_accent_amber">Ámbar táctico</string>
+    <string name="settings_accent_ruby">Rubí deportivo</string>
     <string name="settings_language_title">Idioma</string>
     <string name="settings_language_system">Sistema</string>
     <string name="settings_language_spanish">Español</string>

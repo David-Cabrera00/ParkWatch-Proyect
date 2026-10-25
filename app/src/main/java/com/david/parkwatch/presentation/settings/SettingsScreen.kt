@@ -22,6 +22,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
 import com.david.parkwatch.data.preferences.AppPreferences
+import com.david.parkwatch.data.preferences.ParkAccentColor
 import com.david.parkwatch.data.preferences.ParkLanguage
 import com.david.parkwatch.data.preferences.ParkThemeMode
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
@@ -33,6 +34,7 @@ import com.david.parkwatch.presentation.theme.parkSpacing
 fun SettingsScreen(
     preferences: AppPreferences,
     onThemeSelected: (ParkThemeMode) -> Unit,
+    onAccentColorSelected: (ParkAccentColor) -> Unit = {},
     onLanguageSelected: (ParkLanguage) -> Unit,
     onHistoryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -86,6 +88,42 @@ fun SettingsScreen(
                     label = stringResource(R.string.settings_theme_dark),
                     selected = preferences.themeMode == ParkThemeMode.DARK,
                     onSelect = { onThemeSelected(ParkThemeMode.DARK) },
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                Text(
+                    text = stringResource(R.string.settings_accent_title),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = colors.onSurfaceVariant,
+                )
+            }
+            item {
+                SettingsOption(
+                    label = stringResource(R.string.settings_accent_emerald),
+                    selected = preferences.accentColor == ParkAccentColor.EMERALD,
+                    onSelect = { onAccentColorSelected(ParkAccentColor.EMERALD) },
+                )
+            }
+            item {
+                SettingsOption(
+                    label = stringResource(R.string.settings_accent_cyan),
+                    selected = preferences.accentColor == ParkAccentColor.CYAN,
+                    onSelect = { onAccentColorSelected(ParkAccentColor.CYAN) },
+                )
+            }
+            item {
+                SettingsOption(
+                    label = stringResource(R.string.settings_accent_amber),
+                    selected = preferences.accentColor == ParkAccentColor.AMBER,
+                    onSelect = { onAccentColorSelected(ParkAccentColor.AMBER) },
+                )
+            }
+            item {
+                SettingsOption(
+                    label = stringResource(R.string.settings_accent_ruby),
+                    selected = preferences.accentColor == ParkAccentColor.RUBY,
+                    onSelect = { onAccentColorSelected(ParkAccentColor.RUBY) },
                 )
             }
             item {

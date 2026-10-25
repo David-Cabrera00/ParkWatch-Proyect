@@ -32,6 +32,7 @@ class AppPreferencesStoreTest {
 
         assertEquals(ParkThemeMode.SYSTEM, preferences.themeMode)
         assertEquals(ParkLanguage.SYSTEM, preferences.language)
+        assertEquals(ParkAccentColor.EMERALD, preferences.accentColor)
     }
 
     @Test
@@ -39,6 +40,7 @@ class AppPreferencesStoreTest {
         val preferences = AppPreferences(
             themeMode = ParkThemeMode.DARK,
             language = ParkLanguage.ENGLISH,
+            accentColor = ParkAccentColor.CYAN,
         )
 
         store.save(preferences)
@@ -50,11 +52,13 @@ class AppPreferencesStoreTest {
     fun saveAndRead_supportsEveryThemeAndLanguageCombination() {
         ParkThemeMode.entries.forEach { theme ->
             ParkLanguage.entries.forEach { language ->
-                val expected = AppPreferences(themeMode = theme, language = language)
+                ParkAccentColor.entries.forEach { accent ->
+                    val expected = AppPreferences(themeMode = theme, language = language, accentColor = accent)
 
-                store.save(expected)
+                    store.save(expected)
 
-                assertEquals(expected, store.read())
+                    assertEquals(expected, store.read())
+                }
             }
         }
     }
@@ -65,17 +69,20 @@ class AppPreferencesStoreTest {
             .edit()
             .putString(KEY_THEME, "UNKNOWN_THEME")
             .putString(KEY_LANGUAGE, "UNKNOWN_LANGUAGE")
+            .putString(KEY_ACCENT, "UNKNOWN_ACCENT")
             .commit()
 
         val preferences = store.read()
 
         assertEquals(ParkThemeMode.SYSTEM, preferences.themeMode)
         assertEquals(ParkLanguage.SYSTEM, preferences.language)
+        assertEquals(ParkAccentColor.EMERALD, preferences.accentColor)
     }
 
     private companion object {
         const val PREFERENCES_FILE = "parkwatch_preferences"
         const val KEY_THEME = "theme_mode"
         const val KEY_LANGUAGE = "language"
+        const val KEY_ACCENT = "accent_color"
     }
 }

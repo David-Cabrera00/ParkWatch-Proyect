@@ -17,6 +17,8 @@ import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
 import com.david.parkwatch.R
+import com.david.parkwatch.data.preferences.AppPreferencesStore
+import com.david.parkwatch.data.preferences.ParkAccentColor
 import com.david.parkwatch.data.repository.ParkingRepository
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.presentation.model.labelRes
@@ -89,6 +91,14 @@ class ParkWatchTileService : TileService() {
         deviceParams: DeviceParametersBuilders.DeviceParameters,
         location: ParkingLocation?,
     ): LayoutElementBuilders.LayoutElement {
+        val preferences = AppPreferencesStore(context).read()
+        val accentColor = when (preferences.accentColor) {
+            ParkAccentColor.EMERALD -> 0xFF72E38C.toInt()
+            ParkAccentColor.CYAN -> 0xFF5CE1E6.toInt()
+            ParkAccentColor.AMBER -> 0xFFFFB74D.toInt()
+            ParkAccentColor.RUBY -> 0xFFFF6565.toInt()
+        }
+
         return if (location != null) {
             val vehicleLabel = context.getString(location.vehicleType.labelRes)
             val mainText = buildString {
@@ -100,7 +110,7 @@ class ParkWatchTileService : TileService() {
 
             val now = System.currentTimeMillis()
             val isExpired = location.expiresAt != null && (location.expiresAt - now) <= 0
-            val statusColor = if (isExpired) COLOR_ERROR else COLOR_EMERALD
+            val statusColor = if (isExpired) COLOR_ERROR else accentColor
 
             val statusText = if (location.expiresAt != null) {
                 val remaining = location.expiresAt - now
@@ -135,7 +145,7 @@ class ParkWatchTileService : TileService() {
                 .setPrimaryLabelTextContent(
                     Text.Builder(context, "${context.getString(R.string.home_saved_title)} ($vehicleLabel)")
                         .setTypography(Typography.TYPOGRAPHY_CAPTION1)
-                        .setColor(argb(COLOR_EMERALD))
+                        .setColor(argb(accentColor))
                         .build()
                 )
                 .setContent(
@@ -170,7 +180,7 @@ class ParkWatchTileService : TileService() {
                 .setPrimaryLabelTextContent(
                     Text.Builder(context, context.getString(R.string.tile_name))
                         .setTypography(Typography.TYPOGRAPHY_CAPTION1)
-                        .setColor(argb(COLOR_EMERALD))
+                        .setColor(argb(accentColor))
                         .build()
                 )
                 .setContent(

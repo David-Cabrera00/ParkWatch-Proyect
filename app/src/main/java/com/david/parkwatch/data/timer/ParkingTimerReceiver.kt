@@ -49,6 +49,12 @@ class ParkingTimerReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val vibrationPattern = if (isWarning) {
+            longArrayOf(0, 250, 150, 250) // Double pulse warning (15 min prior)
+        } else {
+            longArrayOf(0, 500, 150, 500, 150, 800) // Energetic triple pulse expired alarm
+        }
+
         val notification = NotificationCompat.Builder(context, ParkingTimerManager.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_directions_car)
             .setContentTitle(context.getString(titleRes))
@@ -60,7 +66,7 @@ class ParkingTimerReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
-            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .setVibrate(vibrationPattern)
             .setContentIntent(pendingIntent)
             .build()
 
