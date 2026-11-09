@@ -1,6 +1,7 @@
 package com.david.parkwatch.data.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.model.VehicleType
 import org.json.JSONArray
@@ -15,8 +16,8 @@ class ParkingRepository(context: Context) {
         val zone = prefs.getString("zone", null) ?: return null
         val row = prefs.getString("row", null) ?: return null
         val spot = prefs.getString("spot", null)
-        val latitude = if (prefs.contains("latitude")) prefs.getFloat("latitude", 0f).toDouble() else null
-        val longitude = if (prefs.contains("longitude")) prefs.getFloat("longitude", 0f).toDouble() else null
+        val latitude = getStoredDouble("latitude")
+        val longitude = getStoredDouble("longitude")
         val parkedAt = prefs.getLong("parkedAt", 0L)
         val expiresAt = if (prefs.contains("expiresAt")) prefs.getLong("expiresAt", 0L) else null
         val vehicleType = VehicleType.fromString(prefs.getString("vehicleType", null))
@@ -39,54 +40,78 @@ class ParkingRepository(context: Context) {
         )
     }
 
-    fun saveParkingLocation(location: ParkingLocation) {
-        prefs.edit()
-            .putString("id", location.id)
-            .putString("floor", location.floor)
-            .putString("zone", location.zone)
-            .putString("row", location.row)
-            .putString("spot", location.spot)
-            .putString("vehicleType", location.vehicleType.name)
-            .apply {
-                if (location.latitude != null) {
-                    putFloat("latitude", location.latitude.toFloat())
-                } else {
-                    remove("latitude")
-                }
-                if (location.longitude != null) {
-                    putFloat("longitude", location.longitude.toFloat())
-                } else {
-                    remove("longitude")
-                }
-                if (location.expiresAt != null) {
-                    putLong("expiresAt", location.expiresAt)
-                } else {
-                    remove("expiresAt")
-                }
+    private fun getStoredDouble(key: String): Double? {
+        if (!prefs.contains(key)) return null
+        return try {
+            java.lang.Double.longBitsToDouble(prefs.getLong(key, 0L))
+        } catch (_: ClassCastException) {
+            try {
+                // Migration fallback for legacy Float representation
+                prefs.getFloat(key, 0f).toDouble()
+            } catch (_: ClassCastException) {
+                prefs.getString(key, null)?.toDoubleOrNull()
             }
-            .putLong("parkedAt", location.parkedAt)
-            .putLong("createdAt", location.createdAt)
-            .putLong("updatedAt", location.updatedAt)
-            .apply()
+        }
+    }
+
+    fun saveParkingLocation(location: ParkingLocation) {
+        prefs.edit {
+            putString("id", location.id)
+            putString("floor", location.floor)
+            putString("zone", location.zone)
+            putString("row", location.row)
+            putString("spot", location.spot)
+            putString("vehicleType", location.vehicleType.name)
+            if (location.latitude != null) {
+                putLong("latitude", java.lang.Double.doubleToRawLongBits(location.latitude))
+            } else {
+                remove("latitude")
+            }
+            if (location.longitude != null) {
+                putLong("longitude", java.lang.Double.doubleToRawLongBits(location.longitude))
+            } else {
+                remove("longitude")
+            }
+            if (location.expiresAt != null) {
+                putLong("expiresAt", location.expiresAt)
+            } else {
+                remove("expiresAt")
+            }
+            putLong("parkedAt", location.parkedAt)
+            putLong("createdAt", location.createdAt)
+            putLong("updatedAt", location.updatedAt)
+        }
 
         addToHistory(location)
     }
 
-    fun clearParkingLocation() {
-        prefs.edit()
-            .remove("id")
-            .remove("floor")
-            .remove("zone")
-            .remove("row")
-            .remove("spot")
-            .remove("latitude")
-            .remove("longitude")
-            .remove("parkedAt")
-            .remove("expiresAt")
-            .remove("vehicleType")
-            .remove("createdAt")
-            .remove("updatedAt")
-            .apply()
+    /**
+     * Completes and archives the parking session into history, clearing active state.
+     */
+    fun archiveParkingLocation(location: ParkingLocation) {
+        addToHistory(location)
+        clearParkingLocation(removeFromHistory = false)
+    }
+
+    fun clearParkingLocation(removeFromHistory: Boolean = false) {
+        val currentId = prefs.getString("id", null)
+        prefs.edit {
+            remove("id")
+            remove("floor")
+            remove("zone")
+            remove("row")
+            remove("spot")
+            remove("latitude")
+            remove("longitude")
+            remove("parkedAt")
+            remove("expiresAt")
+            remove("vehicleType")
+            remove("createdAt")
+            remove("updatedAt")
+        }
+        if (removeFromHistory && currentId != null) {
+            removeHistoryItem(currentId)
+        }
     }
 
     fun getParkingHistory(): List<ParkingLocation> {
@@ -96,20 +121,28 @@ class ParkingRepository(context: Context) {
             val list = mutableListOf<ParkingLocation>()
             for (i in 0 until array.length()) {
                 val obj = array.getJSONObject(i)
+                val id = obj.optString("id", "")
+                if (id.isBlank()) continue
                 list.add(
                     ParkingLocation(
-                        id = obj.getString("id"),
-                        floor = obj.getString("floor"),
-                        zone = obj.getString("zone"),
-                        row = obj.getString("row"),
-                        spot = if (obj.has("spot") && !obj.isNull("spot")) obj.getString("spot") else null,
-                        latitude = if (obj.has("latitude") && !obj.isNull("latitude")) obj.getDouble("latitude") else null,
-                        longitude = if (obj.has("longitude") && !obj.isNull("longitude")) obj.getDouble("longitude") else null,
-                        parkedAt = obj.optLong("parkedAt", 0L),
-                        expiresAt = if (obj.has("expiresAt") && !obj.isNull("expiresAt")) obj.getLong("expiresAt") else null,
+                        id = id,
+                        floor = obj.optString("floor", "—"),
+                        zone = obj.optString("zone", "—"),
+                        row = obj.optString("row", "—"),
+                        spot = if (obj.has("spot") && !obj.isNull("spot")) obj.optString("spot") else null,
+                        latitude = if (obj.has("latitude") && !obj.isNull("latitude")) {
+                            val v = obj.optDouble("latitude")
+                            if (v.isNaN()) null else v
+                        } else null,
+                        longitude = if (obj.has("longitude") && !obj.isNull("longitude")) {
+                            val v = obj.optDouble("longitude")
+                            if (v.isNaN()) null else v
+                        } else null,
+                        parkedAt = obj.optLong("parkedAt", System.currentTimeMillis()),
+                        expiresAt = if (obj.has("expiresAt") && !obj.isNull("expiresAt")) obj.optLong("expiresAt") else null,
                         vehicleType = VehicleType.fromString(obj.optString("vehicleType", "CAR")),
-                        createdAt = obj.optLong("createdAt", 0L),
-                        updatedAt = obj.optLong("updatedAt", 0L),
+                        createdAt = obj.optLong("createdAt", System.currentTimeMillis()),
+                        updatedAt = obj.optLong("updatedAt", System.currentTimeMillis()),
                     )
                 )
             }
@@ -119,14 +152,23 @@ class ParkingRepository(context: Context) {
         }
     }
 
+    fun removeHistoryItem(id: String) {
+        val updatedHistory = getParkingHistory().filter { it.id != id }
+        saveHistoryList(updatedHistory)
+    }
+
     fun clearParkingHistory() {
-        prefs.edit().remove("parking_history").apply()
+        prefs.edit { remove("parking_history") }
     }
 
     private fun addToHistory(location: ParkingLocation) {
         val history = getParkingHistory().filter { it.id != location.id }.toMutableList()
         history.add(0, location)
-        val trimmed = history.take(10)
+        saveHistoryList(history)
+    }
+
+    private fun saveHistoryList(list: List<ParkingLocation>) {
+        val trimmed = list.take(10)
         val array = JSONArray()
         for (item in trimmed) {
             val obj = JSONObject().apply {
@@ -145,7 +187,7 @@ class ParkingRepository(context: Context) {
             }
             array.put(obj)
         }
-        prefs.edit().putString("parking_history", array.toString()).apply()
+        prefs.edit { putString("parking_history", array.toString()) }
     }
 }
 
