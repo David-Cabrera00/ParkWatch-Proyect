@@ -163,4 +163,13 @@
     <string name="history_title">Historial</string>
     <string name="history_empty">Sin registros previos</string>
     <string name="history_clear">Borrar historial</string>
+
+    <!-- Permissions and Lifecycle Fallbacks -->
+    <string name="permission_location_required">Permiso de ubicación necesario para GPS</string>
+    <string name="permission_notification_required">Permite notificaciones para alarmas de parquímetro</string>
+    <string name="permission_audio_required">Permiso de micrófono necesario para dictado por voz</string>
+    <string name="voice_not_available">Dictado por voz no disponible. Usa entrada manual.</string>
+    <string name="voice_recognition_failed">No se reconoció voz. Ingresa los datos manualmente.</string>
+    <string name="gps_not_available">GPS sin señal o apagado. Usa entrada manual.</string>
+    <string name="gps_quick_saved">Ubicación rápida registrada por GPS</string>
 </resources>

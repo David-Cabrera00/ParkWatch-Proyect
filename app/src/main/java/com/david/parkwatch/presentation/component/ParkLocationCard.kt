@@ -1,7 +1,6 @@
 package com.david.parkwatch.presentation.component
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,8 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -30,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
+import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.VehicleType
 import com.david.parkwatch.presentation.model.iconRes
 import com.david.parkwatch.presentation.model.labelRes
@@ -41,6 +39,7 @@ fun ParkLocationCard(
     floor: String,
     zone: String,
     row: String,
+    modifier: Modifier = Modifier,
     spot: String? = null,
     vehicleType: VehicleType = VehicleType.CAR,
     elapsedTime: String? = null,
@@ -48,11 +47,11 @@ fun ParkLocationCard(
     timerProgress: Float? = null,
     isTimerExpired: Boolean = false,
     onClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()
-    val shape = RoundedCornerShape(22.dp)
+    // MASTER.md §30.2: rounded shape between 16.dp and 20.dp
+    val shape = RoundedCornerShape(18.dp)
 
     val borderStroke = BorderStroke(
         width = 1.dp,
@@ -82,7 +81,7 @@ fun ParkLocationCard(
         modifier = cardModifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        // Cabecera: Piso y Badge de Vehículo
+        // Cabecera: Hero Floor y Badge de Vehículo
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -127,64 +126,81 @@ fun ParkLocationCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             MetricPill(
-                label = stringResource(com.david.parkwatch.R.string.location_zone),
+                label = stringResource(R.string.location_zone),
                 value = zone.ifEmpty { "—" },
                 modifier = Modifier.weight(1f),
             )
             MetricPill(
-                label = stringResource(com.david.parkwatch.R.string.location_row),
+                label = stringResource(R.string.location_row),
                 value = row.ifEmpty { "—" },
                 modifier = Modifier.weight(1f),
             )
             if (!spot.isNullOrBlank()) {
                 MetricPill(
-                    label = stringResource(com.david.parkwatch.R.string.location_spot),
+                    label = stringResource(R.string.location_spot),
                     value = spot,
                     modifier = Modifier.weight(1f),
                 )
             }
         }
 
-        // Tiempo transcurrido
+        // Tiempo transcurrido con icono sutil de reloj
         if (!elapsedTime.isNullOrBlank()) {
-            Text(
-                text = elapsedTime,
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-            )
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_schedule),
+                    contentDescription = null,
+                    modifier = Modifier.size(12.dp),
+                    tint = colors.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(
+                    text = elapsedTime,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
 
-        // Temporizador de parquímetro con indicador de progreso circular
+        // Temporizador de parquímetro con Live Progress Ring
         if (!timerInfo.isNullOrBlank()) {
-            val progressColor = if (isTimerExpired || (timerProgress ?: 1f) <= 0.2f) colors.error else colors.primary
-            val containerColor = if (isTimerExpired) colors.errorContainer.copy(alpha = 0.35f) else colors.primaryContainer.copy(alpha = 0.25f)
+            val progress = timerProgress ?: 1f
+            val ringColor = if (isTimerExpired || progress <= 0.2f) colors.error else colors.primary
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
-                    .background(containerColor)
+                    .background(
+                        if (isTimerExpired) colors.errorContainer.copy(alpha = 0.35f)
+                        else colors.primaryContainer.copy(alpha = 0.25f)
+                    )
                     .padding(horizontal = 8.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
             ) {
                 if (timerProgress != null) {
-                    val trackColor = colors.surfaceContainerHigh
-                    Canvas(modifier = Modifier.size(12.dp)) {
+                    androidx.compose.foundation.Canvas(modifier = Modifier.size(12.dp)) {
                         drawCircle(
-                            color = trackColor,
-                            style = Stroke(width = 2.dp.toPx()),
+                            color = ringColor.copy(alpha = 0.25f),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx())
                         )
                         drawArc(
-                            color = progressColor,
+                            color = ringColor,
                             startAngle = -90f,
-                            sweepAngle = 360f * timerProgress,
+                            sweepAngle = 360f * progress,
                             useCenter = false,
-                            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                width = 2.dp.toPx(),
+                                cap = androidx.compose.ui.graphics.StrokeCap.Round
+                            )
                         )
                     }
                     Spacer(modifier = Modifier.size(6.dp))
@@ -192,7 +208,7 @@ fun ParkLocationCard(
                 Text(
                     text = timerInfo,
                     style = MaterialTheme.typography.labelSmall,
-                    color = progressColor,
+                    color = if (isTimerExpired) colors.error else colors.primary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,

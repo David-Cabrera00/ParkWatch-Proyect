@@ -1,7 +1,7 @@
 package com.david.parkwatch.presentation.tile
 
 import android.content.Context
-import androidx.concurrent.futures.ResolvableFuture
+import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DeviceParametersBuilders
@@ -33,39 +33,39 @@ private const val COLOR_TEXT_PRIMARY = 0xFFFFFFFF.toInt()
 private const val COLOR_TEXT_MUTED = 0xFFB0BEC5.toInt()
 
 class ParkWatchTileService : TileService() {
-    override fun onTileRequest(requestParams: RequestBuilders.TileRequest): ListenableFuture<TileBuilders.Tile> {
-        val future = ResolvableFuture.create<TileBuilders.Tile>()
-        val repository = ParkingRepository(this)
-        val location = repository.getParkingLocation()
+    public override fun onTileRequest(requestParams: RequestBuilders.TileRequest): ListenableFuture<TileBuilders.Tile> {
+        return CallbackToFutureAdapter.getFuture { completer ->
+            val repository = ParkingRepository(this)
+            val location = repository.getParkingLocation()
 
-        val tile = TileBuilders.Tile.Builder()
-            .setResourcesVersion(RESOURCES_VERSION)
-            .setTileTimeline(
-                TimelineBuilders.Timeline.Builder()
-                    .addTimelineEntry(
-                        TimelineBuilders.TimelineEntry.Builder()
-                            .setLayout(
-                                LayoutElementBuilders.Layout.Builder()
-                                    .setRoot(buildLayout(this, requestParams.deviceConfiguration, location))
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .build()
-            )
-            .build()
+            val tile = TileBuilders.Tile.Builder()
+                .setResourcesVersion(RESOURCES_VERSION)
+                .setTileTimeline(
+                    TimelineBuilders.Timeline.Builder()
+                        .addTimelineEntry(
+                            TimelineBuilders.TimelineEntry.Builder()
+                                .setLayout(
+                                    LayoutElementBuilders.Layout.Builder()
+                                        .setRoot(buildLayout(this, requestParams.deviceConfiguration, location))
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
 
-        future.set(tile)
-        return future
+            completer.set(tile)
+        }
     }
 
-    override fun onTileResourcesRequest(requestParams: RequestBuilders.ResourcesRequest): ListenableFuture<ResourceBuilders.Resources> {
-        val future = ResolvableFuture.create<ResourceBuilders.Resources>()
-        val resources = ResourceBuilders.Resources.Builder()
-            .setVersion(RESOURCES_VERSION)
-            .build()
-        future.set(resources)
-        return future
+    public override fun onTileResourcesRequest(requestParams: RequestBuilders.ResourcesRequest): ListenableFuture<ResourceBuilders.Resources> {
+        return CallbackToFutureAdapter.getFuture { completer ->
+            val resources = ResourceBuilders.Resources.Builder()
+                .setVersion(RESOURCES_VERSION)
+                .build()
+            completer.set(resources)
+        }
     }
 
     private fun createLaunchClick(context: Context, destination: String): ModifiersBuilders.Clickable {
@@ -142,6 +142,7 @@ class ParkWatchTileService : TileService() {
             }
 
             PrimaryLayout.Builder(deviceParams)
+                .setResponsiveContentInsetEnabled(true)
                 .setPrimaryLabelTextContent(
                     Text.Builder(context, "${context.getString(R.string.home_saved_title)} ($vehicleLabel)")
                         .setTypography(Typography.TYPOGRAPHY_CAPTION1)
@@ -177,6 +178,7 @@ class ParkWatchTileService : TileService() {
                 .build()
         } else {
             PrimaryLayout.Builder(deviceParams)
+                .setResponsiveContentInsetEnabled(true)
                 .setPrimaryLabelTextContent(
                     Text.Builder(context, context.getString(R.string.tile_name))
                         .setTypography(Typography.TYPOGRAPHY_CAPTION1)

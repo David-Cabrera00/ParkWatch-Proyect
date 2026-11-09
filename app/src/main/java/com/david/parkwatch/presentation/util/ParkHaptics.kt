@@ -18,15 +18,10 @@ object ParkHaptics {
     fun playSuccess(context: Context) {
         val vibrator = getVibrator(context) ?: return
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val timings = longArrayOf(0, 60, 80, 100)
-                val amplitudes = intArrayOf(0, 180, 0, 255)
-                val effect = VibrationEffect.createWaveform(timings, amplitudes, -1)
-                vibrator.vibrate(effect)
-            } else {
-                @Suppress("DEPRECATION")
-                vibrator.vibrate(longArrayOf(0, 60, 80, 100), -1)
-            }
+            val timings = longArrayOf(0, 60, 80, 100)
+            val amplitudes = intArrayOf(0, 180, 0, 255)
+            val effect = VibrationEffect.createWaveform(timings, amplitudes, -1)
+            vibrator.vibrate(effect)
         } catch (_: Exception) {
             // Silently fall back if vibrator is unavailable
         }
@@ -38,15 +33,10 @@ object ParkHaptics {
     fun playArrival(context: Context) {
         val vibrator = getVibrator(context) ?: return
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val timings = longArrayOf(0, 80, 70, 80, 70, 150)
-                val amplitudes = intArrayOf(0, 200, 0, 220, 0, 255)
-                val effect = VibrationEffect.createWaveform(timings, amplitudes, -1)
-                vibrator.vibrate(effect)
-            } else {
-                @Suppress("DEPRECATION")
-                vibrator.vibrate(longArrayOf(0, 80, 70, 80, 70, 150), -1)
-            }
+            val timings = longArrayOf(0, 80, 70, 80, 70, 150)
+            val amplitudes = intArrayOf(0, 200, 0, 220, 0, 255)
+            val effect = VibrationEffect.createWaveform(timings, amplitudes, -1)
+            vibrator.vibrate(effect)
         } catch (_: Exception) {
             // Silently fall back if vibrator is unavailable
         }

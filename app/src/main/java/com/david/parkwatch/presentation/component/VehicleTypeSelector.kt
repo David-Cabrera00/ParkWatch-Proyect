@@ -61,13 +61,8 @@ fun VehicleTypeSelector(
                 val isSelected = vehicle == selectedVehicle
                 val background = if (isSelected) colors.primaryContainer else colors.surfaceContainer
                 val tint = if (isSelected) colors.onPrimaryContainer else colors.onSurfaceVariant
-                val buttonSize by animateDpAsState(
-                    targetValue = if (isSelected) 40.dp else 34.dp,
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-                    label = "vehicleButtonSize",
-                )
                 val iconSize by animateDpAsState(
-                    targetValue = if (isSelected) 22.dp else 17.dp,
+                    targetValue = if (isSelected) 22.dp else 18.dp,
                     animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
                     label = "vehicleIconSize",
                 )
@@ -77,7 +72,7 @@ fun VehicleTypeSelector(
 
                 Box(
                     modifier = Modifier
-                        .size(buttonSize)
+                        .size(44.dp)
                         .clip(CircleShape)
                         .then(borderModifier)
                         .background(background)

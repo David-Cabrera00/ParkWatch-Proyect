@@ -23,14 +23,35 @@ fun HomeEmptyPreview() {
 @WearPreviewDevices
 @Composable
 fun HomeSavedPreview() {
+    val sampleLocation = ParkingLocation(
+        id = "saved-1",
+        floor = "P2",
+        zone = "B",
+        row = "14",
+        spot = "27",
+        parkedAt = System.currentTimeMillis() - 25 * 60_000L,
+        vehicleType = VehicleType.CAR,
+        latitude = 40.416775,
+        longitude = -3.703790,
+        createdAt = System.currentTimeMillis(),
+        updatedAt = System.currentTimeMillis(),
+        expiresAt = System.currentTimeMillis() + 35 * 60_000L,
+    )
     ParkWatchTheme(darkTheme = true) {
-        ParkLocationCard(
-            floor = "P1",
-            zone = "A",
-            row = "1",
-            spot = "30",
-            elapsedTime = "Estacionado hace 15 min",
+        HomeScreen(
+            location = sampleLocation,
+            onSaveVehicleClick = {},
+            onViewVehicleClick = {},
+            onCompassClick = {},
         )
+    }
+}
+
+@WearPreviewDevices
+@Composable
+fun SaveParkingPreview() {
+    ParkWatchTheme(darkTheme = true) {
+        com.david.parkwatch.presentation.save.SaveParkingScreen()
     }
 }
 

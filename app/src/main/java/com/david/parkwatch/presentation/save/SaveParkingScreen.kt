@@ -4,10 +4,18 @@ import android.Manifest
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -185,22 +193,36 @@ fun SaveParkingScreen(
             .fillMaxSize()
             .background(colors.background),
     ) { contentPadding ->
-        ScalingLazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
-                .parkRotaryScroll(listState),
-            contentPadding = PaddingValues(
-                top = 28.dp,
-                bottom = 48.dp,
-                start = 14.dp,
-                end = 14.dp,
-            ),
-            verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            when (currentStep.value) {
+        AnimatedContent(
+            targetState = currentStep.value,
+            transitionSpec = {
+                if (targetState.ordinal > initialState.ordinal) {
+                    (slideInHorizontally { width -> width / 3 } + fadeIn()) togetherWith
+                        (slideOutHorizontally { width -> -width / 3 } + fadeOut())
+                } else {
+                    (slideInHorizontally { width -> -width / 3 } + fadeIn()) togetherWith
+                        (slideOutHorizontally { width -> width / 3 } + fadeOut())
+                }
+            },
+            label = "saveStepTransition",
+        ) { step ->
+            val stepListState = rememberScalingLazyListState()
+            ScalingLazyColumn(
+                state = stepListState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding)
+                    .parkRotaryScroll(stepListState),
+                contentPadding = PaddingValues(
+                    top = 28.dp,
+                    bottom = 48.dp,
+                    start = 14.dp,
+                    end = 14.dp,
+                ),
+                verticalArrangement = Arrangement.spacedBy(spacing.SpaceSm),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                when (step) {
                 SaveStep.FLOOR -> {
                     item {
                         StepHeader(
@@ -211,33 +233,51 @@ fun SaveParkingScreen(
                     }
 
                     items(floors) { option ->
-                        RadioButton(
-                            selected = selectedFloor.value == option,
-                            onSelect = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                selectedFloor.value = option
-                                if (returnToReview) {
-                                    returnToReview = false
-                                    currentStep.value = SaveStep.REVIEW
-                                } else {
-                                    currentStep.value = SaveStep.ZONE
+                        val isSelected = selectedFloor.value == option
+                        val borderModifier = if (isSelected) {
+                            Modifier.border(1.5.dp, colors.primary, RoundedCornerShape(18.dp))
+                        } else Modifier
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .clip(RoundedCornerShape(18.dp))
+                                .then(borderModifier)
+                                .background(if (isSelected) colors.primaryContainer else colors.surfaceContainer)
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    selectedFloor.value = option
+                                    if (returnToReview) {
+                                        returnToReview = false
+                                        currentStep.value = SaveStep.REVIEW
+                                    } else {
+                                        currentStep.value = SaveStep.ZONE
+                                    }
                                 }
-                            },
-                            colors = RadioButtonDefaults.radioButtonColors(
-                                selectedContainerColor = colors.primaryContainer,
-                                selectedContentColor = colors.onPrimaryContainer,
-                                selectedControlColor = colors.primary,
-                                unselectedContainerColor = colors.surfaceContainer,
-                                unselectedContentColor = colors.onSurface,
-                                unselectedControlColor = colors.onSurfaceVariant,
-                            ),
-                            label = {
+                                .padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
                                     text = option,
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = if (isSelected) colors.onPrimaryContainer else colors.onSurface,
                                 )
-                            },
-                        )
+                                if (isSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(RoundedCornerShape(50))
+                                            .background(colors.primary),
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     if (selectedFloor.value != null) {
@@ -267,32 +307,40 @@ fun SaveParkingScreen(
                     }
 
                     item {
-                        Row(horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm)) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(spacing.SpaceSm, Alignment.CenterHorizontally),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
                             zones.forEach { option ->
-                                Text(
-                                    text = option,
+                                val isSelected = selectedZone.value == option
+                                val borderModifier = if (isSelected) {
+                                    Modifier.border(1.5.dp, colors.primary, RoundedCornerShape(50))
+                                } else Modifier
+
+                                Box(
                                     modifier = Modifier
                                         .size(48.dp)
                                         .clip(RoundedCornerShape(50))
-                                        .background(if (selectedZone.value == option) colors.primaryContainer else colors.surfaceContainer)
-                                        .selectable(
-                                            selected = selectedZone.value == option,
-                                            onClick = {
-                                                selectedZone.value = option
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                if (returnToReview) {
-                                                    returnToReview = false
-                                                    currentStep.value = SaveStep.REVIEW
-                                                } else {
-                                                    currentStep.value = SaveStep.ROW
-                                                }
-                                            },
-                                            role = Role.RadioButton,
-                                        )
-                                        .wrapContentSize(Alignment.Center),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = if (selectedZone.value == option) colors.onPrimaryContainer else colors.onSurface,
-                                )
+                                        .then(borderModifier)
+                                        .background(if (isSelected) colors.primaryContainer else colors.surfaceContainer)
+                                        .clickable {
+                                            selectedZone.value = option
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            if (returnToReview) {
+                                                returnToReview = false
+                                                currentStep.value = SaveStep.REVIEW
+                                            } else {
+                                                currentStep.value = SaveStep.ROW
+                                            }
+                                        },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        text = option,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = if (isSelected) colors.onPrimaryContainer else colors.onSurface,
+                                    )
+                                }
                             }
                         }
                     }
@@ -338,59 +386,95 @@ fun SaveParkingScreen(
                     }
 
                     item {
-                        RadioButton(
-                            selected = selectedRow.value == "—" || selectedRow.value == null,
-                            onSelect = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                selectedRow.value = "—"
-                                returnToReview = false
-                                currentStep.value = SaveStep.REVIEW
-                            },
-                            colors = RadioButtonDefaults.radioButtonColors(
-                                selectedContainerColor = colors.primaryContainer,
-                                selectedContentColor = colors.onPrimaryContainer,
-                                selectedControlColor = colors.primary,
-                                unselectedContainerColor = colors.surfaceContainer,
-                                unselectedContentColor = colors.onSurface,
-                                unselectedControlColor = colors.onSurfaceVariant,
-                            ),
-                            label = {
+                        val isSelected = selectedRow.value == "—" || selectedRow.value == null
+                        val borderModifier = if (isSelected) {
+                            Modifier.border(1.5.dp, colors.primary, RoundedCornerShape(16.dp))
+                        } else Modifier
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .then(borderModifier)
+                                .background(if (isSelected) colors.primaryContainer else colors.surfaceContainer)
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    selectedRow.value = "—"
+                                    returnToReview = false
+                                    currentStep.value = SaveStep.REVIEW
+                                }
+                                .padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
                                     text = stringResource(R.string.save_parking_row_none),
                                     style = MaterialTheme.typography.bodyLarge,
+                                    color = if (isSelected) colors.onPrimaryContainer else colors.onSurface,
                                 )
-                            },
-                        )
+                                if (isSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(RoundedCornerShape(50))
+                                            .background(colors.primary),
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     items(rows) { option ->
-                        RadioButton(
-                            selected = selectedRow.value == option,
-                            onSelect = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                selectedRow.value = option
-                                if (returnToReview) {
-                                    returnToReview = false
-                                    currentStep.value = SaveStep.REVIEW
-                                } else {
-                                    currentStep.value = SaveStep.SPOT
+                        val isSelected = selectedRow.value == option
+                        val borderModifier = if (isSelected) {
+                            Modifier.border(1.5.dp, colors.primary, RoundedCornerShape(16.dp))
+                        } else Modifier
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .then(borderModifier)
+                                .background(if (isSelected) colors.primaryContainer else colors.surfaceContainer)
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    selectedRow.value = option
+                                    if (returnToReview) {
+                                        returnToReview = false
+                                        currentStep.value = SaveStep.REVIEW
+                                    } else {
+                                        currentStep.value = SaveStep.SPOT
+                                    }
                                 }
-                            },
-                            colors = RadioButtonDefaults.radioButtonColors(
-                                selectedContainerColor = colors.primaryContainer,
-                                selectedContentColor = colors.onPrimaryContainer,
-                                selectedControlColor = colors.primary,
-                                unselectedContainerColor = colors.surfaceContainer,
-                                unselectedContentColor = colors.onSurface,
-                                unselectedControlColor = colors.onSurfaceVariant,
-                            ),
-                            label = {
+                                .padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
-                                    text = option,
+                                    text = "${stringResource(R.string.location_row)} $option",
                                     style = MaterialTheme.typography.bodyLarge,
+                                    color = if (isSelected) colors.onPrimaryContainer else colors.onSurface,
                                 )
-                            },
-                        )
+                                if (isSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(RoundedCornerShape(50))
+                                            .background(colors.primary),
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     item {
@@ -431,53 +515,89 @@ fun SaveParkingScreen(
                     }
 
                     item {
-                        RadioButton(
-                            selected = selectedSpot.value == null,
-                            onSelect = {
-                                selectedSpot.value = null
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                currentStep.value = SaveStep.REVIEW
-                            },
-                            colors = RadioButtonDefaults.radioButtonColors(
-                                selectedContainerColor = colors.primaryContainer,
-                                selectedContentColor = colors.onPrimaryContainer,
-                                selectedControlColor = colors.primary,
-                                unselectedContainerColor = colors.surfaceContainer,
-                                unselectedContentColor = colors.onSurface,
-                                unselectedControlColor = colors.onSurfaceVariant,
-                            ),
-                            label = {
+                        val isSelected = selectedSpot.value == null
+                        val borderModifier = if (isSelected) {
+                            Modifier.border(1.5.dp, colors.primary, RoundedCornerShape(16.dp))
+                        } else Modifier
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .then(borderModifier)
+                                .background(if (isSelected) colors.primaryContainer else colors.surfaceContainer)
+                                .clickable {
+                                    selectedSpot.value = null
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    currentStep.value = SaveStep.REVIEW
+                                }
+                                .padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
                                     text = noneSpotLabel,
                                     style = MaterialTheme.typography.bodyLarge,
+                                    color = if (isSelected) colors.onPrimaryContainer else colors.onSurface,
                                 )
-                            },
-                        )
+                                if (isSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(RoundedCornerShape(50))
+                                            .background(colors.primary),
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     items(spots) { spot ->
-                        RadioButton(
-                            selected = selectedSpot.value == spot,
-                            onSelect = {
-                                selectedSpot.value = spot
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                currentStep.value = SaveStep.REVIEW
-                            },
-                            colors = RadioButtonDefaults.radioButtonColors(
-                                selectedContainerColor = colors.primaryContainer,
-                                selectedContentColor = colors.onPrimaryContainer,
-                                selectedControlColor = colors.primary,
-                                unselectedContainerColor = colors.surfaceContainer,
-                                unselectedContentColor = colors.onSurface,
-                                unselectedControlColor = colors.onSurfaceVariant,
-                            ),
-                            label = {
+                        val isSelected = selectedSpot.value == spot
+                        val borderModifier = if (isSelected) {
+                            Modifier.border(1.5.dp, colors.primary, RoundedCornerShape(16.dp))
+                        } else Modifier
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .then(borderModifier)
+                                .background(if (isSelected) colors.primaryContainer else colors.surfaceContainer)
+                                .clickable {
+                                    selectedSpot.value = spot
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    currentStep.value = SaveStep.REVIEW
+                                }
+                                .padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
-                                    text = spot,
+                                    text = "${stringResource(R.string.location_spot)} $spot",
                                     style = MaterialTheme.typography.bodyLarge,
+                                    color = if (isSelected) colors.onPrimaryContainer else colors.onSurface,
                                 )
-                            },
-                        )
+                                if (isSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(RoundedCornerShape(50))
+                                            .background(colors.primary),
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     item {
@@ -655,6 +775,22 @@ fun SaveParkingScreen(
                 SaveStep.CONFIRMATION -> {
                     item {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(colors.primaryContainer)
+                                    .padding(12.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                androidx.wear.compose.material3.Icon(
+                                    painter = androidx.compose.ui.res.painterResource(R.drawable.ic_check),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = colors.primary,
+                                )
+                            }
+                            Spacer(modifier = Modifier.size(spacing.SpaceSm))
                             Text(
                                 text = stringResource(R.string.save_parking_success_title),
                                 style = MaterialTheme.typography.titleMedium,
@@ -704,6 +840,7 @@ fun SaveParkingScreen(
         }
     }
 }
+}
 
 @Composable
 private fun StepHeader(
@@ -719,6 +856,14 @@ private fun StepHeader(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
+        // MASTER.md §30.3: show Step X of 4 above the title
+        Text(
+            text = stringResource(R.string.save_parking_step, currentStepNumber),
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.primary,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.size(4.dp))
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,

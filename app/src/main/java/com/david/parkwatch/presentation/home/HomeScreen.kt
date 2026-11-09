@@ -1,6 +1,8 @@
 package com.david.parkwatch.presentation.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,16 +27,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.Button
-import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.david.parkwatch.R
 import com.david.parkwatch.domain.model.ParkingLocation
-import com.david.parkwatch.presentation.component.ParkPrimaryButton
+import com.david.parkwatch.presentation.component.ParkIconButton
 import com.david.parkwatch.presentation.component.ParkLocationCard
+import com.david.parkwatch.presentation.component.ParkPrimaryButton
 import com.david.parkwatch.presentation.component.ParkSecondaryButton
 import com.david.parkwatch.presentation.component.parkRotaryScroll
 import com.david.parkwatch.presentation.theme.parkColors
@@ -78,22 +80,44 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (location == null) {
+                // MASTER.md §30.1: simple vehicle icon inside a tonal circular container with ambient glow
                 item {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(50))
-                            .background(colors.surfaceContainer),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_directions_car),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = colors.primary,
+                    Box(contentAlignment = Alignment.Center) {
+                        // Ambient radial glow
+                        Box(
+                            modifier = Modifier
+                                .size(76.dp)
+                                .background(
+                                    androidx.compose.ui.graphics.Brush.radialGradient(
+                                        colors = listOf(
+                                            colors.primary.copy(alpha = 0.22f),
+                                            androidx.compose.ui.graphics.Color.Transparent,
+                                        ),
+                                    ),
+                                    CircleShape,
+                                )
                         )
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(CircleShape)
+                                .background(colors.surfaceContainer)
+                                .border(
+                                    BorderStroke(1.dp, colors.primary.copy(alpha = 0.4f)),
+                                    CircleShape,
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_directions_car),
+                                contentDescription = null,
+                                modifier = Modifier.size(26.dp),
+                                tint = colors.primary,
+                            )
+                        }
                     }
                 }
+                // Short message: Where did you park?
                 item {
                     Text(
                         text = stringResource(R.string.home_empty_title),
@@ -103,145 +127,98 @@ fun HomeScreen(
                         maxLines = 1,
                     )
                 }
+                // Brief supporting line
+                item {
+                    Text(
+                        text = stringResource(R.string.home_empty_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                    )
+                }
                 item {
                     Spacer(modifier = Modifier.size(spacing.SpaceXs))
                 }
+                // Dominant primary action: Save vehicle
                 item {
                     ParkPrimaryButton(
                         onClick = onSaveVehicleClick,
                         label = stringResource(R.string.home_save_vehicle),
                     )
                 }
+                // Ergonomic wrist actions row: Voice input, Quick GPS, History, Settings
                 item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        Button(
-                            onClick = onQuickSaveClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(40.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colors.surfaceContainerHigh,
-                                contentColor = colors.onSurface,
-                            ),
-                            label = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center,
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_location_on),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = colors.primary,
-                                    )
-                                    Spacer(modifier = Modifier.size(4.dp))
-                                    Text(
-                                        text = stringResource(R.string.home_quick_save_chip),
-                                        style = MaterialTheme.typography.labelSmall,
-                                        maxLines = 1,
-                                    )
-                                }
-                            },
-                        )
-                        Button(
-                            onClick = onVoiceClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(40.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colors.surfaceContainerHigh,
-                                contentColor = colors.onSurface,
-                            ),
-                            label = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center,
-                                    modifier = Modifier.fillMaxWidth(),
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_mic),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = colors.primary,
-                                    )
-                                    Spacer(modifier = Modifier.size(4.dp))
-                                    Text(
-                                        text = stringResource(R.string.home_voice_chip),
-                                        style = MaterialTheme.typography.labelSmall,
-                                        maxLines = 1,
-                                    )
-                                }
-                            },
-                        )
-                    }
+                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
                 }
                 item {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Button(
-                            onClick = onHistoryClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(38.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colors.surfaceContainer,
-                                contentColor = colors.onSurfaceVariant,
-                            ),
-                            label = {
-                                Text(
-                                    text = stringResource(R.string.history_title),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            },
+                        ParkIconButton(
+                            iconRes = R.drawable.ic_mic,
+                            contentDescription = stringResource(R.string.home_voice_input),
+                            onClick = onVoiceClick,
+                            size = 44.dp,
+                            iconSize = 20.dp,
+                            containerColor = colors.surfaceContainerHigh,
+                            iconTint = colors.primary,
                         )
-                        Button(
+                        ParkIconButton(
+                            iconRes = R.drawable.ic_location_on,
+                            contentDescription = stringResource(R.string.home_quick_save),
+                            onClick = onQuickSaveClick,
+                            size = 44.dp,
+                            iconSize = 20.dp,
+                            containerColor = colors.surfaceContainerHigh,
+                            iconTint = colors.secondary,
+                        )
+                        ParkIconButton(
+                            iconRes = R.drawable.ic_history,
+                            contentDescription = stringResource(R.string.history_title),
+                            onClick = onHistoryClick,
+                            size = 44.dp,
+                            iconSize = 20.dp,
+                            containerColor = colors.surfaceContainer,
+                            iconTint = colors.onSurfaceVariant,
+                        )
+                        ParkIconButton(
+                            iconRes = R.drawable.ic_settings,
+                            contentDescription = stringResource(R.string.settings_open),
                             onClick = onSettingsClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(38.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = colors.surfaceContainer,
-                                contentColor = colors.onSurfaceVariant,
-                            ),
-                            label = {
-                                Text(
-                                    text = stringResource(R.string.settings_open),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            },
+                            size = 44.dp,
+                            iconSize = 20.dp,
+                            containerColor = colors.surfaceContainer,
+                            iconTint = colors.onSurfaceVariant,
                         )
                     }
                 }
             } else {
+                // Saved state: Status header
                 item {
-                    Text(
-                        text = stringResource(R.string.home_saved_title),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = colors.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(colors.primary),
+                        )
+                        Text(
+                            text = stringResource(R.string.home_saved_title),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = colors.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                 }
+                // Hero ParkLocationCard
                 item {
                     val now = System.currentTimeMillis()
-                    val elapsedMinutes = ((now - location.parkedAt) / 60_000L)
-                        .coerceAtLeast(0L)
-                        .toInt()
                     val timerInfo = if (location.expiresAt != null) {
                         val remaining = location.expiresAt - now
                         if (remaining <= 0) {
@@ -277,8 +254,9 @@ fun HomeScreen(
                     )
                 }
                 item {
-                    Spacer(modifier = Modifier.size(spacing.SpaceSm))
+                    Spacer(modifier = Modifier.size(spacing.SpaceXs))
                 }
+                // Actions hierarchy: one primary CTA, then secondary
                 if (location.latitude != null && location.longitude != null) {
                     item {
                         ParkPrimaryButton(
