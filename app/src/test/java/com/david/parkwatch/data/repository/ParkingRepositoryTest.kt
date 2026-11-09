@@ -4,6 +4,7 @@ import android.content.Context
 import com.david.parkwatch.domain.model.ParkingLocation
 import com.david.parkwatch.domain.model.VehicleType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -163,6 +164,85 @@ class ParkingRepositoryTest {
 
         repository.clearParkingHistory()
         assertEquals(0, repository.getParkingHistory().size)
+    }
+
+    @Test
+    fun saveParkingLocation_preservesExactDoublePrecisionCoordinates() {
+        val highPrecisionLat = 40.41677543219876
+        val highPrecisionLng = -3.70379012345678
+        val location = createLocation(
+            latitude = highPrecisionLat,
+            longitude = highPrecisionLng,
+        )
+
+        repository.saveParkingLocation(location)
+        val saved = repository.getParkingLocation()
+
+        assertEquals(highPrecisionLat, saved?.latitude ?: 0.0, 0.000000000001)
+        assertEquals(highPrecisionLng, saved?.longitude ?: 0.0, 0.000000000001)
+    }
+
+    @Test
+    fun getParkingLocation_migratesLegacyFloatCoordinatesSuccessfully() {
+        // Manually write legacy float values to preferences
+        context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString("id", "legacy-id")
+            .putString("floor", "P1")
+            .putString("zone", "A")
+            .putString("row", "1")
+            .putFloat("latitude", 40.416775f)
+            .putFloat("longitude", -3.703790f)
+            .commit()
+
+        val loaded = repository.getParkingLocation()
+        assertNotNull(loaded)
+        assertEquals(40.416775, loaded?.latitude ?: 0.0, 0.0001)
+        assertEquals(-3.703790, loaded?.longitude ?: 0.0, 0.0001)
+    }
+
+    @Test
+    fun clearParkingLocation_withRemoveFromHistory_removesItemFromHistory() {
+        val loc = createLocation(id = "delete-me", floor = "P1", zone = "A")
+        repository.saveParkingLocation(loc)
+        assertEquals(1, repository.getParkingHistory().size)
+
+        repository.clearParkingLocation(removeFromHistory = true)
+        assertNull(repository.getParkingLocation())
+        assertEquals(0, repository.getParkingHistory().size)
+    }
+
+    @Test
+    fun archiveParkingLocation_keepsItemInHistoryWhileClearingActive() {
+        val loc = createLocation(id = "archive-me", floor = "P2", zone = "B")
+        repository.saveParkingLocation(loc)
+
+        repository.archiveParkingLocation(loc)
+        assertNull(repository.getParkingLocation())
+        assertEquals(1, repository.getParkingHistory().size)
+        assertEquals("archive-me", repository.getParkingHistory()[0].id)
+    }
+
+    @Test
+    fun getParkingHistory_recoversGracefullyFromCorruptedOrPartialJson() {
+        val malformedJson = """
+            [
+                {"id":"valid-1","floor":"P1","zone":"A","row":"1"},
+                {"broken_record_without_id": true},
+                {"id":"valid-2","floor":"P2","zone":"B","row":"2","vehicleType":"MOTORCYCLE"}
+            ]
+        """.trimIndent()
+
+        context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE)
+            .edit()
+            .putString("parking_history", malformedJson)
+            .commit()
+
+        val history = repository.getParkingHistory()
+        assertEquals(2, history.size)
+        assertEquals("valid-1", history[0].id)
+        assertEquals("valid-2", history[1].id)
+        assertEquals(VehicleType.MOTORCYCLE, history[1].vehicleType)
     }
 
     private fun createLocation(
