@@ -5,4 +5,16 @@
         <ignore path="res/drawable/tile_preview.png" />
         <ignore path="res/drawable-round/tile_preview.png" />
     </issue>
+    <!-- Ignore English dictionary spell check for Spanish strings (e.g. "momento") -->
+    <issue id="Typos">
+        <ignore path="res/values/strings.xml" />
+    </issue>
+    <!-- localeConfig is supported on API 33+ and ignored on earlier APIs -->
+    <issue id="UnusedAttribute">
+        <ignore path="src/main/AndroidManifest.xml" />
+    </issue>
+    <!-- String resources reserved for subsequent development phases -->
+    <issue id="UnusedResources">
+        <ignore path="res/values/strings.xml" />
+    </issue>
 </lint>

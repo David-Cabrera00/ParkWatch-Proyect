@@ -14,12 +14,35 @@ android {
         minSdk = 30
         targetSdk = 37
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
+    }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = (project.findProperty("RELEASE_STORE_FILE") as? String)
+                ?: System.getenv("RELEASE_STORE_FILE")
+            if (keystorePath != null && file(keystorePath).exists()) {
+                storeFile = file(keystorePath)
+                storePassword = (project.findProperty("RELEASE_STORE_PASSWORD") as? String)
+                    ?: System.getenv("RELEASE_STORE_PASSWORD")
+                keyAlias = (project.findProperty("RELEASE_KEY_ALIAS") as? String)
+                    ?: System.getenv("RELEASE_KEY_ALIAS")
+                keyPassword = (project.findProperty("RELEASE_KEY_PASSWORD") as? String)
+                    ?: System.getenv("RELEASE_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
+            val releaseSigning = signingConfigs.getByName("release")
+            if (releaseSigning.storeFile != null) {
+                signingConfig = releaseSigning
+            }
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             optimization {
                 enable = true
                 packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
@@ -37,6 +60,11 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+        }
+    }
+    bundle {
+        language {
+            enableSplit = false
         }
     }
 }

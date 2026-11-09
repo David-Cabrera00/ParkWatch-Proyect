@@ -49,11 +49,17 @@ app/src/main/java/com/david/parkwatch/
     └── theme/                   # Theme, Color, Spacing
 ```
 
-## Build Configuration
-- Configuration cache **enabled** (`org.gradle.configuration-cache=true` in gradle.properties)
-- Version catalog in `gradle/libs.versions.toml`
-- Lint config: `app/lint.xml` (ignores IconLocation for tile_preview images)
-- `useLibrary("wear-sdk")` in app build.gradle.kts
+## Build Configuration & Environment Requirements
+- **JDK:** Java 21 (LTS). Tested with Oracle JDK `21.0.10` / Android Studio JBR `25.0.3`/`21`. `JAVA_HOME` should point to a valid JDK 21 installation (or `gradlew.bat` will fallback to `C:\Program Files\Java\jdk-21.0.10` or Android Studio JBR).
+- **Android SDK:** `compileSdk = 37`, `targetSdk = 37`, `minSdk = 30` (Wear OS 3.0+). Defined in `local.properties` via `sdk.dir`.
+- **Gradle:** 9.6.0 via wrapper (`gradle/wrapper/gradle-wrapper.properties`).
+- **AGP (Android Gradle Plugin):** 9.4.1.
+- **Kotlin:** 2.2.10 with Compose Compiler plugin.
+- Configuration cache **enabled** (`org.gradle.configuration-cache=true` in gradle.properties).
+- Version catalog in `gradle/libs.versions.toml`.
+- Lint config: `app/lint.xml` (handles preview icons, Spanish typo dictionary exemption, localeConfig attribute, and WIP resource strings).
+- Bundle config: `bundle.language.enableSplit = false` in `app/build.gradle.kts` for in-app runtime locale switching.
+- `useLibrary("wear-sdk")` in app build.gradle.kts.
 
 ## Design System (MUST FOLLOW)
 Reference: `design-system/parkwatch/MASTER.md`
