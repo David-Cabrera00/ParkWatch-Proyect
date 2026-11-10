@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.core.net.toUri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -105,6 +106,28 @@ fun ParkingDetailScreen(
                     )
                 }
                 item {
+                    val now = System.currentTimeMillis()
+                    val timerInfo = if (location.expiresAt != null) {
+                        val remaining = location.expiresAt - now
+                        if (remaining <= 0) {
+                            val expiredMin = ((-remaining) / 60_000L).coerceAtLeast(0L)
+                            stringResource(R.string.timer_expired_ago, expiredMin)
+                        } else {
+                            val remMin = (remaining / 60_000L).coerceAtLeast(0L)
+                            if (remMin < 60) {
+                                stringResource(R.string.timer_remaining_minutes, remMin)
+                            } else {
+                                stringResource(R.string.timer_remaining_hours_minutes, remMin / 60, remMin % 60)
+                            }
+                        }
+                    } else null
+
+                    val isExpired = location.expiresAt != null && now >= location.expiresAt
+                    val timerProgress = if (location.expiresAt != null) {
+                        val totalDuration = (location.expiresAt - location.parkedAt).coerceAtLeast(1L)
+                        ((location.expiresAt - now).toFloat() / totalDuration).coerceIn(0f, 1f)
+                    } else null
+
                     ParkLocationCard(
                         floor = location.floor,
                         zone = location.zone,
@@ -112,6 +135,9 @@ fun ParkingDetailScreen(
                         spot = location.spot,
                         vehicleType = location.vehicleType,
                         elapsedTime = TimeFormatter.formatElapsedTime(location.parkedAt, context),
+                        timerInfo = timerInfo,
+                        timerProgress = timerProgress,
+                        isTimerExpired = isExpired,
                     )
                 }
                 if (location.latitude != null && location.longitude != null) {
@@ -132,14 +158,10 @@ fun ParkingDetailScreen(
                     item {
                         ParkSecondaryButton(
                             onClick = {
-                                val geoUri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehiculo)")
-                                val mapIntent = Intent(Intent.ACTION_VIEW, geoUri).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
-                                val webUri = Uri.parse("https://maps.google.com/?q=${location.latitude},${location.longitude}")
-                                val webIntent = Intent(Intent.ACTION_VIEW, webUri).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
+                                val geoUri = "geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(Vehiculo)".toUri()
+                                val mapIntent = Intent(Intent.ACTION_VIEW, geoUri)
+                                val webUri = "https://maps.google.com/?q=${location.latitude},${location.longitude}".toUri()
+                                val webIntent = Intent(Intent.ACTION_VIEW, webUri)
                                 try {
                                     context.startActivity(mapIntent)
                                 } catch (_: Exception) {
@@ -276,9 +298,7 @@ fun ParkingDetailScreen(
                                     type = "text/plain"
                                     putExtra(Intent.EXTRA_TEXT, shareText)
                                 }
-                                val chooser = Intent.createChooser(sendIntent, context.getString(R.string.detail_share)).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
+                                val chooser = Intent.createChooser(sendIntent, context.getString(R.string.detail_share))
                                 context.startActivity(chooser)
                             } catch (_: ActivityNotFoundException) {
                             }

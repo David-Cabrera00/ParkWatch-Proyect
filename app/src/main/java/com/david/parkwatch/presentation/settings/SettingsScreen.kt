@@ -34,10 +34,10 @@ import com.david.parkwatch.presentation.theme.parkSpacing
 fun SettingsScreen(
     preferences: AppPreferences,
     onThemeSelected: (ParkThemeMode) -> Unit,
-    onAccentColorSelected: (ParkAccentColor) -> Unit = {},
     onLanguageSelected: (ParkLanguage) -> Unit,
-    onHistoryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    onAccentColorSelected: (ParkAccentColor) -> Unit = {},
+    onHistoryClick: () -> Unit = {},
 ) {
     val colors = parkColors()
     val spacing = parkSpacing()

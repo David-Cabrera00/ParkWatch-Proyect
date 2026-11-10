@@ -160,4 +160,13 @@
     <string name="history_title">History</string>
     <string name="history_empty">No previous records</string>
     <string name="history_clear">Clear history</string>
+
+    <!-- Permissions and Lifecycle Fallbacks -->
+    <string name="permission_location_required">Location permission required for GPS</string>
+    <string name="permission_notification_required">Allow notifications for parking timer alerts</string>
+    <string name="permission_audio_required">Microphone permission required for voice input</string>
+    <string name="voice_not_available">Voice input not available. Use manual entry.</string>
+    <string name="voice_recognition_failed">Voice not recognized. Enter details manually.</string>
+    <string name="gps_not_available">GPS signal unavailable or disabled. Use manual entry.</string>
+    <string name="gps_quick_saved">Quick GPS location saved</string>
 </resources>

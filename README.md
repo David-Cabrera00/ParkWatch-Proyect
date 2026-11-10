@@ -87,8 +87,10 @@ app/src/main/java/com/david/parkwatch/
 ## 🚀 Compilación y Ejecución
 
 ### Requisitos previos
-* **JDK:** Java 21 (`jdk-21.0.10` recomendado)
-* **Android SDK:** Platform API 37 (Build Tools 35+)
+* **JDK:** Java 21 LTS (`jdk-21.0.10` o JetBrains Runtime JBR de Android Studio). Variable de entorno `JAVA_HOME` configurada (o detección automática integrada en `gradlew.bat`).
+* **Android SDK:** `compileSdk 37`, `targetSdk 37`, `minSdk 30` (Wear OS 3.0+). Requiere Platform API 37 y Build Tools 35+. Ubicación en `local.properties` (`sdk.dir=...`).
+* **Gradle:** 9.6.0 (incluido mediante Gradle Wrapper `./gradlew`).
+* **Android Gradle Plugin (AGP):** 9.4.1.
 
 ### Comandos principales
 

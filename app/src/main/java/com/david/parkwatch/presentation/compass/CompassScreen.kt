@@ -1,9 +1,12 @@
 package com.david.parkwatch.presentation.compass
 
+import android.Manifest
 import android.hardware.GeomagneticField
 import android.location.Location
 import android.location.LocationListener
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -93,6 +96,37 @@ fun CompassScreen(
 
     var continuousAngle by remember { mutableFloatStateOf(0f) }
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            val coords = locationHelper.getLastKnownCoordinates()
+            if (coords != null) {
+                val (dist, bearing) = LocationHelper.calculateDistanceAndBearing(
+                    coords.first,
+                    coords.second,
+                    targetLatitude,
+                    targetLongitude,
+                )
+                distanceMeters = dist
+                targetBearing = bearing
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (!locationHelper.hasLocationPermission()) {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ),
+            )
+        }
+    }
+
     DisposableEffect(Unit) {
         val initialCoords = locationHelper.getLastKnownCoordinates()
         if (initialCoords != null) {
@@ -166,13 +200,24 @@ fun CompassScreen(
         label = "compassNeedleAngle",
     )
 
-    // Trigger arrival haptic once
+    // Arrival detection
     val isArrived = (distanceMeters ?: Float.MAX_VALUE) <= ARRIVAL_THRESHOLD_METERS
     LaunchedEffect(isArrived) {
         if (isArrived && !hasTriggeredArrivalHaptic) {
             hasTriggeredArrivalHaptic = true
             ParkHaptics.playArrival(context)
         }
+    }
+
+    // Haptic Alignment: detect if user is pointing directly at the vehicle (within +/- 10 degrees)
+    val isAligned = targetBearing != null && (relativeAngle in 0f..10f || relativeAngle in 350f..360f)
+    var wasAligned by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isAligned) {
+        if (isAligned && !wasAligned && !isArrived) {
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+        wasAligned = isAligned
     }
 
     var isConfirmingFinish by remember { mutableStateOf(false) }
@@ -314,6 +359,7 @@ fun CompassScreen(
                 CompassDial(
                     needleAngle = animatedAngle,
                     isArrived = false,
+                    isAligned = isAligned,
                     primaryColor = colors.primary,
                     secondaryColor = colors.secondary,
                     surfaceColor = colors.surfaceContainer,
@@ -391,8 +437,13 @@ fun CompassScreen(
                                 )
                             }
                         } else {
+                            val waitingStatus = when {
+                                !locationHelper.hasLocationPermission() -> stringResource(R.string.permission_location_required)
+                                !locationHelper.isLocationEnabled() -> stringResource(R.string.gps_not_available)
+                                else -> stringResource(R.string.compass_waiting_gps)
+                            }
                             Text(
-                                text = stringResource(R.string.compass_waiting_gps),
+                                text = waitingStatus,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = colors.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
@@ -415,6 +466,7 @@ private fun CompassDial(
     surfaceColor: Color,
     outlineColor: Color,
     modifier: Modifier = Modifier,
+    isAligned: Boolean = false,
 ) {
     Canvas(
         modifier = modifier
@@ -424,12 +476,13 @@ private fun CompassDial(
         val center = Offset(size.width / 2f, size.height / 2f)
         val radius = (size.minDimension / 2f) - 36.dp.toPx()
 
-        // Outer Ring
+        // Outer Ring - glows when aligned
+        val ringColor = if (isAligned) primaryColor.copy(alpha = 0.65f) else outlineColor
         drawCircle(
-            color = outlineColor,
+            color = ringColor,
             radius = radius,
             center = center,
-            style = Stroke(width = 2.dp.toPx()),
+            style = Stroke(width = if (isAligned) 3.dp.toPx() else 2.dp.toPx()),
         )
 
         // Cardinal Ticks

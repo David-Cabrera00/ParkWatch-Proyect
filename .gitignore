@@ -19,3 +19,8 @@ local.properties
 
 # Android Studio
 .idea/
+
+# Signing keystores and secrets
+*.jks
+*.keystore
+keystore.properties

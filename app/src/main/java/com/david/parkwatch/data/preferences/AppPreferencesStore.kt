@@ -1,6 +1,7 @@
 package com.david.parkwatch.data.preferences
 
 import android.content.Context
+import androidx.core.content.edit
 
 class AppPreferencesStore(context: Context) {
     private val preferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
@@ -20,11 +21,11 @@ class AppPreferencesStore(context: Context) {
     }
 
     fun save(preferences: AppPreferences) {
-        this.preferences.edit()
-            .putString(KEY_THEME, preferences.themeMode.name)
-            .putString(KEY_LANGUAGE, preferences.language.name)
-            .putString(KEY_ACCENT, preferences.accentColor.name)
-            .apply()
+        this.preferences.edit {
+            putString(KEY_THEME, preferences.themeMode.name)
+            putString(KEY_LANGUAGE, preferences.language.name)
+            putString(KEY_ACCENT, preferences.accentColor.name)
+        }
     }
 
     private companion object {

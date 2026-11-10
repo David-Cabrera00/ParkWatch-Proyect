@@ -4,7 +4,10 @@ import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -104,6 +108,7 @@ fun ParkWatchNavHost(
         )
         repository.saveParkingLocation(quickLocation)
         savedLocation.value = quickLocation
+        com.david.parkwatch.presentation.notification.ParkingNotificationManager.showParkingNotification(context, quickLocation)
         ParkWatchTileManager.requestUpdate(context)
         ParkWatchComplicationManager.requestUpdate(context)
         navController.navigate(DetailRoute)
@@ -111,9 +116,22 @@ fun ParkWatchNavHost(
 
     val quickSavePermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        val coords = locationHelper.getLastKnownCoordinates()
-        performQuickSave(coords)
+    ) { permissions ->
+        val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (fineGranted || coarseGranted) {
+            val coords = locationHelper.getLastKnownCoordinates()
+            if (coords != null) {
+                performQuickSave(coords)
+                Toast.makeText(context, context.getString(R.string.gps_quick_saved), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, context.getString(R.string.gps_not_available), Toast.LENGTH_SHORT).show()
+                navController.navigate(SaveRoute)
+            }
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_location_required), Toast.LENGTH_SHORT).show()
+            navController.navigate(SaveRoute)
+        }
     }
 
     val speechLauncher = rememberLauncherForActivityResult(
@@ -129,8 +147,45 @@ fun ParkWatchNavHost(
                 if (parsed.hasData) {
                     voiceParsedInfo.value = parsed
                     navController.navigate(SaveRoute)
+                    return@rememberLauncherForActivityResult
                 }
             }
+        }
+        // Fallback when speech fails, cancels or no keywords recognized
+        Toast.makeText(context, context.getString(R.string.voice_recognition_failed), Toast.LENGTH_SHORT).show()
+        voiceParsedInfo.value = null
+        navController.navigate(SaveRoute)
+    }
+
+    fun launchSpeechRecognition() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
+            )
+            putExtra(
+                RecognizerIntent.EXTRA_PROMPT,
+                context.getString(R.string.voice_prompt),
+            )
+        }
+        try {
+            speechLauncher.launch(intent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(context, context.getString(R.string.voice_not_available), Toast.LENGTH_SHORT).show()
+            voiceParsedInfo.value = null
+            navController.navigate(SaveRoute)
+        }
+    }
+
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            launchSpeechRecognition()
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_audio_required), Toast.LENGTH_SHORT).show()
+            voiceParsedInfo.value = null
+            navController.navigate(SaveRoute)
         }
     }
 
@@ -147,7 +202,19 @@ fun ParkWatchNavHost(
                 },
                 onQuickSaveClick = {
                     if (locationHelper.hasLocationPermission()) {
-                        performQuickSave(locationHelper.getLastKnownCoordinates())
+                        if (!locationHelper.isLocationEnabled()) {
+                            Toast.makeText(context, context.getString(R.string.gps_not_available), Toast.LENGTH_SHORT).show()
+                            navController.navigate(SaveRoute)
+                        } else {
+                            val coords = locationHelper.getLastKnownCoordinates()
+                            if (coords != null) {
+                                performQuickSave(coords)
+                                Toast.makeText(context, context.getString(R.string.gps_quick_saved), Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, context.getString(R.string.gps_not_available), Toast.LENGTH_SHORT).show()
+                                navController.navigate(SaveRoute)
+                            }
+                        }
                     } else {
                         quickSavePermissionLauncher.launch(
                             arrayOf(
@@ -158,21 +225,22 @@ fun ParkWatchNavHost(
                     }
                 },
                 onVoiceClick = {
-                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                        putExtra(
-                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                        )
-                        putExtra(
-                            RecognizerIntent.EXTRA_PROMPT,
-                            context.getString(R.string.voice_prompt)
-                        )
-                    }
-                    try {
-                        speechLauncher.launch(intent)
-                    } catch (e: ActivityNotFoundException) {
+                    val isAvailable = SpeechRecognizer.isRecognitionAvailable(context) ||
+                        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).resolveActivity(context.packageManager) != null
+                    if (!isAvailable) {
+                        Toast.makeText(context, context.getString(R.string.voice_not_available), Toast.LENGTH_SHORT).show()
                         voiceParsedInfo.value = null
                         navController.navigate(SaveRoute)
+                    } else {
+                        val hasMicPermission = ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.RECORD_AUDIO,
+                        ) == PackageManager.PERMISSION_GRANTED
+                        if (hasMicPermission) {
+                            launchSpeechRecognition()
+                        } else {
+                            audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        }
                     }
                 },
                 onViewVehicleClick = { navController.navigate(DetailRoute) },
@@ -187,6 +255,7 @@ fun ParkWatchNavHost(
                 onSaveSuccess = { location ->
                     repository.saveParkingLocation(location)
                     savedLocation.value = location
+                    com.david.parkwatch.presentation.notification.ParkingNotificationManager.showParkingNotification(context, location)
                     ParkWatchTileManager.requestUpdate(context)
                     ParkWatchComplicationManager.requestUpdate(context)
                     voiceParsedInfo.value = null
@@ -207,7 +276,8 @@ fun ParkWatchNavHost(
                     onSetTimerClick = { navController.navigate(TimerRoute) },
                     onDeleteConfirmed = {
                         ParkingTimerManager.cancelTimer(context)
-                        repository.clearParkingLocation()
+                        com.david.parkwatch.presentation.notification.ParkingNotificationManager.cancelParkingNotification(context)
+                        repository.clearParkingLocation(removeFromHistory = true)
                         savedLocation.value = null
                         ParkWatchTileManager.requestUpdate(context)
                         ParkWatchComplicationManager.requestUpdate(context)
@@ -233,7 +303,8 @@ fun ParkWatchNavHost(
                     },
                     onClearLocation = {
                         ParkingTimerManager.cancelTimer(context)
-                        repository.clearParkingLocation()
+                        com.david.parkwatch.presentation.notification.ParkingNotificationManager.cancelParkingNotification(context)
+                        repository.archiveParkingLocation(location)
                         savedLocation.value = null
                         ParkWatchTileManager.requestUpdate(context)
                         ParkWatchComplicationManager.requestUpdate(context)
@@ -248,28 +319,56 @@ fun ParkWatchNavHost(
         composable(TimerRoute) {
             val location = savedLocation.value
             if (location != null) {
+                val pendingMinutes = remember { mutableStateOf<Int?>(null) }
+                val applyTimer: (Int) -> Unit = { durationMinutes ->
+                    val newExpiresAt = if (durationMinutes > 0) {
+                        System.currentTimeMillis() + (durationMinutes * 60 * 1000L)
+                    } else {
+                        null
+                    }
+                    val updated = location.copy(
+                        expiresAt = newExpiresAt,
+                        updatedAt = System.currentTimeMillis(),
+                    )
+                    repository.saveParkingLocation(updated)
+                    savedLocation.value = updated
+                    com.david.parkwatch.presentation.notification.ParkingNotificationManager.showParkingNotification(context, updated)
+                    if (newExpiresAt != null) {
+                        ParkingTimerManager.scheduleTimer(context, newExpiresAt)
+                    } else {
+                        ParkingTimerManager.cancelTimer(context)
+                    }
+                    ParkWatchTileManager.requestUpdate(context)
+                    ParkWatchComplicationManager.requestUpdate(context)
+                    navController.popBackStack()
+                }
+
+                val notificationPermissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission()
+                ) { isGranted ->
+                    val mins = pendingMinutes.value ?: return@rememberLauncherForActivityResult
+                    pendingMinutes.value = null
+                    if (!isGranted) {
+                        Toast.makeText(context, context.getString(R.string.permission_notification_required), Toast.LENGTH_SHORT).show()
+                    }
+                    applyTimer(mins)
+                }
+
                 SetTimerScreen(
                     currentExpiresAt = location.expiresAt,
                     onSetTimer = { durationMinutes ->
-                        val newExpiresAt = if (durationMinutes > 0) {
-                            System.currentTimeMillis() + (durationMinutes * 60 * 1000L)
+                        if (durationMinutes <= 0) {
+                            applyTimer(0)
                         } else {
-                            null
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                !ParkingTimerManager.hasNotificationPermission(context)
+                            ) {
+                                pendingMinutes.value = durationMinutes
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                applyTimer(durationMinutes)
+                            }
                         }
-                        val updated = location.copy(
-                            expiresAt = newExpiresAt,
-                            updatedAt = System.currentTimeMillis(),
-                        )
-                        repository.saveParkingLocation(updated)
-                        savedLocation.value = updated
-                        if (newExpiresAt != null) {
-                            ParkingTimerManager.scheduleTimer(context, newExpiresAt)
-                        } else {
-                            ParkingTimerManager.cancelTimer(context)
-                        }
-                        ParkWatchTileManager.requestUpdate(context)
-                        ParkWatchComplicationManager.requestUpdate(context)
-                        navController.popBackStack()
                     },
                 )
             } else {
@@ -282,6 +381,7 @@ fun ParkWatchNavHost(
                 onSaveSuccess = { location ->
                     repository.saveParkingLocation(location)
                     savedLocation.value = location
+                    com.david.parkwatch.presentation.notification.ParkingNotificationManager.showParkingNotification(context, location)
                     ParkWatchTileManager.requestUpdate(context)
                     ParkWatchComplicationManager.requestUpdate(context)
                 },
@@ -306,6 +406,7 @@ fun ParkWatchNavHost(
                 onSelectLocation = { selected ->
                     repository.saveParkingLocation(selected)
                     savedLocation.value = selected
+                    com.david.parkwatch.presentation.notification.ParkingNotificationManager.showParkingNotification(context, selected)
                     ParkWatchTileManager.requestUpdate(context)
                     ParkWatchComplicationManager.requestUpdate(context)
                     navController.navigate(DetailRoute)

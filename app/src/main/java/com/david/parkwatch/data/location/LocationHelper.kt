@@ -24,6 +24,13 @@ class LocationHelper(private val context: Context) {
         return fine || coarse
     }
 
+    fun isLocationEnabled(): Boolean {
+        if (locationManager == null) return false
+        val gps = try { locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) } catch (_: Exception) { false }
+        val net = try { locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) } catch (_: Exception) { false }
+        return gps || net
+    }
+
     @SuppressLint("MissingPermission")
     fun getLastKnownCoordinates(): Pair<Double, Double>? {
         if (!hasLocationPermission() || locationManager == null) return null
