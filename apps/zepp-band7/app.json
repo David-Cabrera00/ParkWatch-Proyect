@@ -4,7 +4,7 @@
     "appId": 1000017,
     "appName": "Parqueo Band 7",
     "appType": "app",
-    "version": { "code": 18, "name": "0.2.7" },
+    "version": { "code": 19, "name": "0.2.8" },
     "icon": "icon.png",
     "vender": "Parqueo Band 7",
     "description": "Gestión de parqueo para Xiaomi Smart Band 7"
