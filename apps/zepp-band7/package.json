@@ -1,0 +1,15 @@
+{
+  "name": "parqueo-band7",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Aplicación de parqueo para Xiaomi Smart Band 7",
+  "main": "app.js",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "build": "node scripts/zeus-band7.cjs build -t mi-band7-intl",
+    "preview": "node scripts/zeus-band7.cjs preview -t mi-band7-intl",
+    "export:band7": "node scripts/export-band7.cjs"
+  },
+  "devDependencies": { "@zeppos/device-types": "^1.0.0", "@zeppos/zeus-cli": "1.8.2" },
+  "_moduleAliases": { "zeppos-app-utils": "node_modules/@zeppos/zeus-cli/private-modules/zeppos-app-utils" }
+}

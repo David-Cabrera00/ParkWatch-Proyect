@@ -122,3 +122,7 @@ Los artefactos generados se ubican en:
 
 Desarrollado con dedicación para la plataforma Wear OS. Todos los derechos reservados.
 
+
+## Xiaomi Smart Band 7 (Zepp OS)
+
+La versión offline para Xiaomi Smart Band 7 se mantiene como subproyecto independiente en [apps/zepp-band7](apps/zepp-band7/README.md).

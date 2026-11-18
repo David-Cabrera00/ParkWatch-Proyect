@@ -1,0 +1,27 @@
+{
+  "configVersion": "v2",
+  "app": {
+    "appId": 1000017,
+    "appName": "Parqueo Band 7",
+    "appType": "app",
+    "version": { "code": 18, "name": "0.2.7" },
+    "icon": "icon.png",
+    "vender": "Parqueo Band 7",
+    "description": "Gestión de parqueo para Xiaomi Smart Band 7"
+  },
+  "permissions": ["device:os.vibrate"],
+  "runtime": {
+    "apiVersion": { "compatible": "1.0.0", "target": "1.0.1", "minVersion": "1.0.0" }
+  },
+  "targets": {
+    "mi-band7-intl": {
+      "module": {
+        "page": { "pages": ["page/index", "page/menu", "page/new-parking", "page/parking", "page/history", "page/settings"] }
+      },
+      "platforms": [{ "name": "xiaomi-smart-band-7-international", "deviceSource": 263 }],
+      "designWidth": 192
+    }
+  },
+  "i18n": { "en-US": { "appName": "Parqueo Band 7" } },
+  "defaultLanguage": "en-US"
+}

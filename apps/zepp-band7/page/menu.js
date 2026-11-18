@@ -1,0 +1,2 @@
+import { bg, text, button, go, appState } from '../shared/ui';
+Page({ build() { bg(); appState().error = ''; text(8, 18, 176, 32, 'MENÚ', 20, 0x35e08f); button(90, 'Guardar parqueo', () => go('page/new-parking')); button(150, 'Mi parqueo', () => go('page/parking')); button(210, 'Historial local', () => go('page/history')); button(270, 'Configuración', () => go('page/settings'), 0x333333); button(398, 'Inicio', () => go('page/index'), 0x333333); } });
